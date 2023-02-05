@@ -6,7 +6,7 @@ import java.util.List;
 
 import org.junit.jupiter.api.Test;
 
-class Iteration_one_tests {
+class IterationOneTests {
 
 	@Test
 	void testInputFile() {
@@ -54,7 +54,7 @@ class Iteration_one_tests {
 		
 		assertEquals(scheduler.getCurrentInstruction(), elevatorSubsytem.getCurrentInstruction()); 
 		
-		System.out.println("tests passed");
+		System.out.println("Junit Tests passed");
 		
 	}
 

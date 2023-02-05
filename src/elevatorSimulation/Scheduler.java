@@ -121,4 +121,19 @@ public class Scheduler extends Thread
 		return instruction;
 	}
 	
+	/**
+	 * 
+	 * @return returns the current instruction held by the scheduler
+	 */
+	public Instruction getCurrentInstruction() {
+		return instruction; 
+	}
+	/**
+	 * clears the currents instruction held by the scheduler
+	 */
+	
+	public void clearInstruction() {
+		instruction = null; 
+	}
+	
 }

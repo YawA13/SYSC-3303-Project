@@ -58,5 +58,26 @@ public class ElevatorSubsystem extends Thread
 		System.out.println("ElevatorSubsystem sending instructions");
 		scheduler.setInstructionsFromElevator(instruction);
 	}
+	
+	/**
+	 * public function used in test script to get instruction 
+	 */
+	public Instruction getCurrentInstruction() {
+		return instruction; 
+	}
+
+	/**
+	 * public function used in test script to call test send getInstruction() function
+	 */
+	public void testGetInstruciton() {
+		getInstructions(); 
+	}
+	
+	/**
+	 * public function used in test script to call test sendInstruction() function
+	 */
+	public void testSendInstruciton() {
+		sendInstructions();  
+	}
 
 }

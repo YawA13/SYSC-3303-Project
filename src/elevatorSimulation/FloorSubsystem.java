@@ -79,7 +79,7 @@ public class FloorSubsystem extends Thread
 	/**
 	 * Convert instructions text file to list of instructions
 	 */
-	private void readInput()
+	public void readInput()
 	{
 		try {
 			//Create and initialize file and scanner objects to read text file
@@ -100,5 +100,26 @@ public class FloorSubsystem extends Thread
 		} catch (FileNotFoundException e) { //Catch exception and print error
 			e.printStackTrace();
 		}
+	}
+	/**
+	 * 
+	 * @return returns the list of instructions held by the floor subsystem
+	 */
+	public List<Instruction> getInstructionsAsList(){
+		return this.instructions; 
+	}
+	
+	/**
+	 * function used to test the getInstruction() function
+	 */
+	public void testGetInstruciton() {
+		getInstruction(); 
+	}
+	/**
+	 * function used to test the sendInstruction() function
+	 * @param int n is the index of the instruction we want to test
+	 */
+	public void testSendInstruciton(int n) {
+		sendInstruction(instructions.get(n)); 
 	}
 }

@@ -11,5 +11,6 @@ package elevatorSimulation;
  */
 public enum ButtonStatus {
 	Up, 
-	Down
+	Down,
+	Off
 }

@@ -13,7 +13,7 @@ public class Instruction {
 	
 	private String time; //Time button was pressed
 	private int floor; //Floor elevator is on
-	private int elevatorNum; //Elevator number
+	private int carButton; //Elevator number
 	private ButtonStatus buttonStatus; //Direction elevator will go
 	
 	/**
@@ -22,14 +22,14 @@ public class Instruction {
 	 * 
 	 * @param time Time button was pressed
 	 * @param floor Floor elevator is on
-	 * @param elevatorNum Elevator number
+	 * @param carButton Elevator number
 	 * @param buttonStatus Direction elevator will go
 	 */
-	public Instruction(String time, int floor, int elevatorNum, String buttonStatus)
+	public Instruction(String time, int floor, int carButton, String buttonStatus)
 	{
 		this.time = time;
 		this.floor = floor;
-		this.elevatorNum = elevatorNum;
+		this.carButton = carButton;
 		
 		if (buttonStatus.equalsIgnoreCase("Up")) //If buttonStatus is up
 		{
@@ -63,7 +63,7 @@ public class Instruction {
 			this.buttonStatus = ButtonStatus.Down; //Set to enum Down
 		}
 		
-		this.elevatorNum = Integer.parseInt(split[3]); //Set elevator number as 4th object in array
+		this.carButton = Integer.parseInt(split[3]); //Set elevator number as 4th object in array
 		
 	}
 	
@@ -73,10 +73,43 @@ public class Instruction {
 	@Override
 	public String toString()
 	{
-		String message = "Time:"+time+", Floor:"+floor+", Elevator Number:"+elevatorNum
+		String message = "Time:"+time+", Floor:"+floor+", Elevator Number:"+carButton
 				+", Button:"+buttonStatus.toString();
 		return message;
 		
 	}
 
+	public String getTime() {
+		return time;
+	}
+
+	public void setTime(String time) {
+		this.time = time;
+	}
+
+	public int getFloor() {
+		return floor;
+	}
+
+	public void setFloor(int floor) {
+		this.floor = floor;
+	}
+
+	public int getCarButton() {
+		return carButton;
+	}
+
+	public void setElevatorNum(int elevatorNum) {
+		this.carButton = elevatorNum;
+	}
+
+	public ButtonStatus getButtonStatus() {
+		return buttonStatus;
+	}
+
+	public void setButtonStatus(ButtonStatus buttonStatus) {
+		this.buttonStatus = buttonStatus;
+	}
+
+	
 }

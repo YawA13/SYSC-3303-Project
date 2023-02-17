@@ -22,6 +22,7 @@ public class FloorSubsystem extends Thread
 	private Scheduler scheduler; //variable to hold scheduler object
 	private String inputLoc; //variable to hold location of instructions text file
 	private List<Instruction> instructions; //variable to hold list of instructions from text file
+	private ArrayList<Floor> floors = new ArrayList<>();
 	
 	/**
 	 * Initialize Floor subsystem
@@ -29,11 +30,15 @@ public class FloorSubsystem extends Thread
 	 * @param scheduler Scheduler object to synchronize information between elevator and floor class
 	 * @param inputLoc String location of text file to read
 	 */
-	public FloorSubsystem(Scheduler scheduler, String inputLoc)
+	public FloorSubsystem(Scheduler scheduler, String inputLoc, int numOfFloors)
 	{
 		this.scheduler = scheduler;
 		this.inputLoc = inputLoc;
 		instructions = new ArrayList<>(); //Initialize Array list to hold instruction's
+		for (int i = 0; i < numOfFloors; i++)
+		{
+			floors.add(new Floor());
+		}
 	}
 	
 	/**

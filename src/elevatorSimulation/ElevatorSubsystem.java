@@ -7,22 +7,26 @@ package elevatorSimulation;
  * through synchronized methods in the scheduler class
  * 
  * @author Group 3, SYSC 3303
- * @version Milestone 1
- * @since 2023-02-04
+ * @version Milestone 2
+ * @since 2023-02-16
  */
 public class ElevatorSubsystem extends Thread
 {
 	private Scheduler scheduler;
 	private Instruction instruction;
+	private ElevatorStates state;
+	private Elevator elevator;
 	
 	/**
 	 * Initialize Elevator subsystem
 	 * 
 	 * @param scheduler Object to synchronize information between elevator and floor class
 	 */
-	public ElevatorSubsystem (Scheduler scheduler)
+	public ElevatorSubsystem (Scheduler scheduler, int floors)
 	{
 		this.scheduler = scheduler;
+		this.state = ElevatorStates.DoorsOpen;
+		this.elevator = new Elevator(floors, this);
 	}
 	
 	/**
@@ -31,10 +35,89 @@ public class ElevatorSubsystem extends Thread
 	 */
 	public void run()
 	{
+		ElevatorStates stateBeforeArriving = ElevatorStates.DoorsOpen;
+		
 		while (true)
 		{
-			getInstructions();
-			sendInstructions();
+			switch (state)
+			{
+				case DoorsOpen:
+					if (instruction == null)
+					{
+						getInstructions();
+					}
+					state = ElevatorStates.DoorsClosing;
+					break;
+				case DoorsClosing:
+					//TODO setLightsAndStatus()
+					setDirection();	
+					break;
+				case MovingUp:
+					//timer
+					stateBeforeArriving = ElevatorStates.MovingUp;
+					state = ElevatorStates.Arriving;
+					break;
+				case MovingDown:
+					//timer 
+					stateBeforeArriving = ElevatorStates.MovingDown;
+					state = ElevatorStates.Arriving;
+					break;
+				case Arriving:
+					
+					boolean atDestination = scheduler.checkElevatorLocation(elevator.getCurrentFloor());
+					if(atDestination)
+					{
+						state = ElevatorStates.DoorsOpening;
+					}
+					else
+					{
+						state = stateBeforeArriving;
+					}
+					break;
+				case DoorsOpening:
+					
+					if (elevator.currentFloor == scheduler.getElevatorFinalDest())
+					{
+						scheduler.elevatorFinished(instruction);
+						instruction = null;
+						elevator.resetElevator();
+					}
+				
+					state = ElevatorStates.DoorsOpen;
+					break;
+			}
+			
+		}
+		
+	}
+	
+	private void setDirection()
+	{
+		int finalFloorNum;
+		
+		if (elevator.getNumOfPassengers() > 0)
+		{
+			finalFloorNum = instruction.getFloor();
+		}
+		else
+		{
+			finalFloorNum = instruction.getCarButton();
+		}
+		
+		
+		if (finalFloorNum - elevator.getCurrentFloor() > 0)
+		{
+			state = ElevatorStates.MovingUp;
+			elevator.moving(ButtonStatus.Up, finalFloorNum);
+		}
+		else if (finalFloorNum - elevator.getCurrentFloor() < 0)
+		{
+			state = ElevatorStates.MovingDown;
+			elevator.moving(ButtonStatus.Down, finalFloorNum);
+		}
+		else
+		{
+			state = ElevatorStates.DoorsOpening;	
 		}
 		
 	}
@@ -49,15 +132,7 @@ public class ElevatorSubsystem extends Thread
 		System.out.println("ElevatorSubsystem received Intructions: "+instruction);
 	}
 	
-	/**
-	 * Print statement showing elevator subsystem is sending an Instruction object
-	 * and pass object to scheduler method
-	 */
-	private void sendInstructions()
-	{
-		System.out.println("ElevatorSubsystem sending instructions");
-		scheduler.setInstructionsFromElevator(instruction);
-	}
+
 	
 	/**
 	 * public function used in test script to get instruction 
@@ -73,11 +148,6 @@ public class ElevatorSubsystem extends Thread
 		getInstructions(); 
 	}
 	
-	/**
-	 * public function used in test script to call test sendInstruction() function
-	 */
-	public void testSendInstruciton() {
-		sendInstructions();  
-	}
+
 
 }

@@ -1,5 +1,8 @@
 package elevatorSimulation;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * Code to create Scheduler thread object for Milestone 1 SYSC 3303.
  * Scheduler object will have synchronized methods in order for elevator class
@@ -11,18 +14,28 @@ package elevatorSimulation;
  */
 public class Scheduler extends Thread
 {
-	Instruction instruction; //Variable to hold instruction object
-	private boolean instructionForElevator; //Variable to see if instruction is meant for elevator
-	private boolean instructionForFloor; //Variable to see if instruction is meant for floor
+	
+	/**
+	list for instructions from ppl outside the elevator, 
+	will be checked when elevator reaches a floor if going same direction **/
+	private List <Instruction> pendingInstructions;
+	
+	/**
+	 * list for instruction from ppl inside the elevator, 
+	 * will be checked if ppl need to get off
+	 */
+	private List <Instruction> activeInstructions;
+	private SchedulerStates state;
+	
 	
 	/**
 	 * Initialize scheduler object
 	 */
 	public Scheduler()
 	{
-		instruction = null;
-		instructionForElevator = false;
-		instructionForFloor = false;
+		pendingInstructions = new ArrayList<Instruction>(); 
+		activeInstructions = new ArrayList<Instruction> (); 
+		state = SchedulerStates.Waiting;
 	}
 	
 	/**
@@ -32,6 +45,16 @@ public class Scheduler extends Thread
 	{
 		while(true)
 		{
+			
+			switch (state)
+			{
+				case Waiting:
+					break;
+				case ProcessRequest:
+					break;
+				case ProcessElevator:
+					break;
+			}
 			
 		}
 	}
@@ -45,7 +68,7 @@ public class Scheduler extends Thread
 	public synchronized void setInstructionsFromFloor(Instruction instruction) 
 	{
 		//Until there are no instructions for floor or elevator wait
-		while (instructionForFloor || instructionForElevator)
+		while (!(state == SchedulerStates.Waiting))
 		{
 			try { 
                 wait();
@@ -55,8 +78,7 @@ public class Scheduler extends Thread
 		}
 		
 		System.out.println("Scheduler received instructions from floor");
-		this.instruction = instruction; //Save instruction object
-		instructionForElevator = true; //Set true to allow elevator to get instruction object in other synchronized method
+		this.pendingInstructions.add(instruction); //Save instruction object
 		notifyAll(); //Notify synchronized methods
 	}
 
@@ -69,7 +91,9 @@ public class Scheduler extends Thread
 	public synchronized Instruction getInstructionForElevator() 
 	{
 		//While there are no instructions for elevator wait
-		while (!instructionForElevator)
+		state = SchedulerStates.ProcessRequest;
+		
+		while (activeInstructions.size() == 0 && pendingInstructions.size() == 0)
 		{
 			try { 
                 wait();
@@ -79,15 +103,26 @@ public class Scheduler extends Thread
 		}
 		
 		System.out.println("Scheduler sending instructions to elevator");
-		instructionForElevator = false; //Set false to allow elevator to set instruction object in other synchronized method
-		notifyAll(); //Notify synchronized methods
-		return instruction;
+		notifyAll();
+		
+		if (activeInstructions.size() > 0)
+		{
+			state = SchedulerStates.Waiting;
+			return activeInstructions.get(0);
+		}
+		else
+		{
+			state = SchedulerStates.Waiting;
+			return pendingInstructions.get(0);
+		}
+		
+		
 	}
 
-	public synchronized void setInstructionsFromElevator(Instruction instruction) 
+	public synchronized void elevatorFinished(Instruction instruction) 
 	{
 		//While there are instructions available wait 
-		while (instructionForElevator)
+		while (activeInstructions.size() == 0)
 		{
 			try { 
                 wait();
@@ -96,17 +131,17 @@ public class Scheduler extends Thread
             }
 		}
 		
-		System.out.println("Scheduler received instructions from elevator");
-		this.instruction = instruction; //Save instruction object
-		instructionForFloor = true; 
+		System.out.println("Scheduler received the finished instructions from elevator");
+		//activeInstructions.remove(instruction);
 		notifyAll(); //Notify synchronized methods
 		
 	}
 	
-	public synchronized Instruction getInstructionForFloor() 
+	public synchronized boolean checkElevatorLocation(int elevatorLocation) 
 	{
-		//While there are no instructions for floor wait
-		while (!instructionForFloor)
+		boolean stopElevator = false;
+		//While there are instructions available wait 
+		while (activeInstructions.size() == 0)
 		{
 			try { 
                 wait();
@@ -115,25 +150,35 @@ public class Scheduler extends Thread
             }
 		}
 		
-		System.out.println("Scheduler sending instructions to Floor");
-		instructionForFloor = false; //Set false to allow floor to set instruction object in other synchronized method
+		for (Instruction instruction : activeInstructions)
+		{
+			if (instruction.getCarButton() == elevatorLocation)
+			{
+				activeInstructions.remove(instruction);
+				stopElevator =  true;
+			}
+		}
+		
+		for (Instruction instruction : pendingInstructions)
+		{
+			if ((instruction.getFloor() == elevatorLocation) 
+					&& (instruction.getButtonStatus() == activeInstructions.get(0).getButtonStatus()))
+			{
+				activeInstructions.add(instruction);
+				pendingInstructions.remove(instruction);
+				stopElevator = true;
+			}
+			
+		}
+		
 		notifyAll(); //Notify synchronized methods
-		return instruction;
+		return stopElevator;
+			
 	}
 	
-	/**
-	 * 
-	 * @return returns the current instruction held by the scheduler
-	 */
-	public Instruction getCurrentInstruction() {
-		return instruction; 
-	}
-	/**
-	 * clears the currents instruction held by the scheduler
-	 */
-	
-	public void clearInstruction() {
-		instruction = null; 
+	public int getElevatorFinalDest()
+	{
+		return activeInstructions.get(0).getCarButton();
 	}
 	
 }

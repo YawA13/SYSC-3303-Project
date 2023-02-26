@@ -14,6 +14,7 @@ public class Elevator {
 	private int numOfPassengers;
 	
 	public Elevator(int floors, ElevatorSubsystem subsystem) {
+		elevatorButtonLamps = new ArrayList<>();
 		currentFloor = 1; 
 		bStatus = ButtonStatus.Off;
 		
@@ -90,5 +91,27 @@ public class Elevator {
 		this.numOfPassengers = numOfPassengers;
 	}
 	
+	public void moveUp()
+	{
+		currentFloor++;
+		
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+	}
 	
+	public void moveDown()
+	{
+		currentFloor--;
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
 }

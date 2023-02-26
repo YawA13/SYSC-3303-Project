@@ -42,6 +42,7 @@ public class ElevatorSubsystem extends Thread
 			switch (state)
 			{
 				case DoorsOpen:
+					System.out.println("ElevatorSubsystem state: DoorsOpen, at floor"+ elevator.currentFloor);
 					if (instruction == null)
 					{
 						getInstructions();
@@ -49,21 +50,26 @@ public class ElevatorSubsystem extends Thread
 					state = ElevatorStates.DoorsClosing;
 					break;
 				case DoorsClosing:
+					System.out.println("ElevatorSubsystem state: DoorsClosing, at floor"+ elevator.currentFloor);
 					//TODO setLightsAndStatus()
 					setDirection();	
 					break;
 				case MovingUp:
 					//timer
+					elevator.moveUp();
+					System.out.println("ElevatorSubsystem state: MovingUp, at floor"+ elevator.currentFloor);
 					stateBeforeArriving = ElevatorStates.MovingUp;
 					state = ElevatorStates.Arriving;
 					break;
 				case MovingDown:
 					//timer 
+					elevator.moveDown();
+					System.out.println("ElevatorSubsystem state: MovingDown, at floor"+ elevator.currentFloor);
 					stateBeforeArriving = ElevatorStates.MovingDown;
 					state = ElevatorStates.Arriving;
 					break;
 				case Arriving:
-					
+					System.out.println("ElevatorSubsystem state: Arriving, at floor"+ elevator.currentFloor);
 					boolean atDestination = scheduler.checkElevatorLocation(elevator.getCurrentFloor());
 					if(atDestination)
 					{
@@ -75,9 +81,10 @@ public class ElevatorSubsystem extends Thread
 					}
 					break;
 				case DoorsOpening:
-					
+					System.out.println("ElevatorSubsystem state: DoorsOpening, at floor" + elevator.currentFloor);
 					if (elevator.currentFloor == scheduler.getElevatorFinalDest())
 					{
+						System.out.println("ElevatorSubsystem: Elevator Done");
 						scheduler.elevatorFinished(instruction);
 						instruction = null;
 						elevator.resetElevator();

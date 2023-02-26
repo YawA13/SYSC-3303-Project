@@ -1,5 +1,7 @@
 package elevatorSimulation;
 
+import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 
 /**
  * Code to create Instruction object for Milestone 1 SYSC 3303.
@@ -11,10 +13,13 @@ package elevatorSimulation;
  */
 public class Instruction {
 	
-	private String time; //Time button was pressed
+	private final String TIME_FORMAT = "hh:mm:ss.mmm";
+	
+	private LocalTime time; //Time button was pressed
 	private int floor; //Floor elevator is on
 	private int carButton; //Elevator number
 	private ButtonStatus buttonStatus; //Direction elevator will go
+	private long timeAfterInital;
 	
 	/**
 	 * Initialize Instruction object by passing in time, floor, elevator number,
@@ -27,7 +32,9 @@ public class Instruction {
 	 */
 	public Instruction(String time, int floor, int carButton, String buttonStatus)
 	{
-		this.time = time;
+	
+		this.time = LocalTime.parse(time);
+		
 		this.floor = floor;
 		this.carButton = carButton;
 		
@@ -39,6 +46,8 @@ public class Instruction {
 		{
 			this.buttonStatus = ButtonStatus.Down; //Set to enum down
 		}
+		
+		this.timeAfterInital = 0;
 	}
 	
 	/**
@@ -50,7 +59,10 @@ public class Instruction {
 	public Instruction (String inputData)
 	{
 		String [] split = inputData.split("\\t"); //Split text based on TAB delimiter into array
-		this.time = split[0]; //Set time as first object in array
+		
+		//Set time as first object in array
+		String timeText = split[0]; 
+		this.time = LocalTime.parse(timeText);
 		this.floor = Integer.parseInt(split[1]); //Set floor as second object in array
 		
 		//Set Button status as third object in array
@@ -64,6 +76,7 @@ public class Instruction {
 		}
 		
 		this.carButton = Integer.parseInt(split[3]); //Set elevator number as 4th object in array
+		this.timeAfterInital = 0;
 		
 	}
 	
@@ -79,11 +92,11 @@ public class Instruction {
 		
 	}
 
-	public String getTime() {
+	public LocalTime getTime() {
 		return time;
 	}
 
-	public void setTime(String time) {
+	public void setTime(LocalTime time) {
 		this.time = time;
 	}
 
@@ -111,5 +124,14 @@ public class Instruction {
 		this.buttonStatus = buttonStatus;
 	}
 
+	public void setTimeAfterInital(long diffInMilli)
+	{
+		this.timeAfterInital = diffInMilli;
+	}
 	
+	
+	public long getTimeAfterInital()
+	{
+		return timeAfterInital;
+	}
 }

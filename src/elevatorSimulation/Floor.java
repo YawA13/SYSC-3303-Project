@@ -1,21 +1,27 @@
 package elevatorSimulation;
 
 import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.Queue;
 
 public class Floor 
 {
-	boolean upFloorLamp;
-	boolean downFloorLamp;
+	private int floorNum;
+	private boolean upFloorLamp;
+	private boolean downFloorLamp;
 	
-	boolean upDirectionLamp;
-	boolean downDirectionLamp;
+	private boolean upDirectionLamp;
+	private boolean downDirectionLamp;
 	
-	boolean upButton;
-	boolean downButton;
+	private boolean upButton;
+	private boolean downButton;
 	
-	boolean arrivalLamp;
+	private boolean arrivalLamp;
+	
+	private Queue<Instruction> requests;
+	private FloorSubsystem floorSubsystem;
 
-	public Floor() 
+	public Floor(FloorSubsystem floorSubsystem, int floorNum) 
 	{
 		this.upFloorLamp = false;
 		this.downFloorLamp = false;
@@ -24,6 +30,9 @@ public class Floor
 		this.upButton = false;
 		this.downButton = false;
 		this.arrivalLamp = false;
+		this.requests = new LinkedList<>();
+		this.floorSubsystem = floorSubsystem;
+		this.floorNum = floorNum;
 	}
 
 	public boolean getUpFloorLamp() {
@@ -82,7 +91,27 @@ public class Floor
 		this.arrivalLamp = arrivalLamp;
 	}
 	
-
+	public void addRequest(Instruction instruction)
+	{
+		requests.add(instruction);
+	}
 	
+	public void sendLatestRequestToSubsystem(Instruction currentRequest)
+	{
+		System.out.println(this.floorNum+" Floor: sendInstructions");
+		floorSubsystem.sendInstruction(currentRequest);
+	}
+	
+	//Change to be in run if this class becomes a thread
+	public void startFloorRequest()
+	{
+		Thread floorRequest = new FloorRequest (this, requests);
+		floorRequest.start();
+	}
 
+	public int getFloorNum()
+	{
+		return floorNum;
+	}
+	
 }

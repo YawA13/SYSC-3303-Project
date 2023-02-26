@@ -37,7 +37,7 @@ public class FloorSubsystem extends Thread
 		instructions = new ArrayList<>(); //Initialize Array list to hold instruction's
 		for (int i = 0; i < numOfFloors; i++)
 		{
-			floors.add(new Floor());
+			floors.add(new Floor(this, (i+1)));
 		}
 	}
 	
@@ -50,14 +50,31 @@ public class FloorSubsystem extends Thread
 	{
 		readInput(); //Convert text file to list of instructions
 		
-		//for each instruction in list send instruction to scheduler and get response
 		for (int i = 0; i < instructions.size(); i++)
 		{
-			sendInstruction(instructions.get(i));
-			getInstruction();
+			int floorInstructionIndex = instructions.get(i).getFloor() - 1; 
+			
+			if (i != 0)
+			{
+				long diffInMilli = java.time.Duration.between(instructions.get(0).getTime(), instructions.get(i).getTime()).toMillis();
+				instructions.get(i).setTimeAfterInital(diffInMilli);
+			}
+			
+			floors.get(floorInstructionIndex).addRequest(instructions.get(i));
 		}
 		
-		System.exit(0); //Program will exit 
+		
+		for (int i = 0; i < floors.size(); i++)
+		{
+			floors.get(i).startFloorRequest();
+		}
+		
+		while (true)
+		{
+			
+		}
+		
+		//System.exit(0); //Program will exit 
 			
 	}
 	
@@ -65,7 +82,7 @@ public class FloorSubsystem extends Thread
 	 * Print statement showing floor subsystem is sending an Instruction object
 	 * and pass object to scheduler method
 	 */
-	private void sendInstruction(Instruction newInstruction)
+	public void sendInstruction(Instruction newInstruction)
 	{
 		System.out.println("FloorSubsystem sending instructions, "+newInstruction);
 		scheduler.setInstructionsFromFloor(newInstruction);
@@ -77,8 +94,8 @@ public class FloorSubsystem extends Thread
 	 */
 	private void getInstruction()
 	{
-		Instruction newInstruction = scheduler.getInstructionForFloor();
-		System.out.println("FloorSubsystem has received Intructions: "+ newInstruction + "\n");
+		//Instruction newInstruction = scheduler.getInstructionForFloor();
+		//System.out.println("FloorSubsystem has received Intructions: "+ newInstruction + "\n");
 	}
 	
 	/**

@@ -12,7 +12,7 @@ public class ElevatorSimulation {
 	
 	public static void main (String [] args)
 	{
-		int numOfFloors = 4;
+		int numOfFloors = 5;
 		Thread scheduler = new Scheduler ();
 		//Create Elevator and floor objects and pass scheduler to constructor to share information between them 
 		Thread elevatorSubsytem = new ElevatorSubsystem ((Scheduler) scheduler, numOfFloors);

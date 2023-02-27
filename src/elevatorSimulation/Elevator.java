@@ -91,6 +91,17 @@ public class Elevator {
 		this.numOfPassengers = numOfPassengers;
 	}
 	
+	public void toggleNumOfPassengers() {
+		if(numOfPassengers == 0)
+		{
+			this.numOfPassengers = 1;
+		}
+		else
+		{
+			this.numOfPassengers = 0;
+		}
+	}
+	
 	public void moveUp()
 	{
 		currentFloor++;

@@ -46,7 +46,7 @@ public class ElevatorSubsystem extends Thread
 					if (instruction == null)
 					{
 						getInstructions();
-					}
+					}					
 					state = ElevatorStates.DoorsClosing;
 					break;
 				case DoorsClosing:
@@ -73,7 +73,8 @@ public class ElevatorSubsystem extends Thread
 					boolean atDestination = scheduler.checkElevatorLocation(elevator.getCurrentFloor());
 					if(atDestination)
 					{
-						state = ElevatorStates.DoorsOpening;
+						elevator.toggleNumOfPassengers();
+						state = ElevatorStates.DoorsOpening;			
 					}
 					else
 					{
@@ -102,7 +103,7 @@ public class ElevatorSubsystem extends Thread
 	{
 		int finalFloorNum;
 		
-		if (elevator.getNumOfPassengers() > 0)
+		if (elevator.getNumOfPassengers() == 0)
 		{
 			finalFloorNum = instruction.getFloor();
 		}
@@ -110,7 +111,7 @@ public class ElevatorSubsystem extends Thread
 		{
 			finalFloorNum = instruction.getCarButton();
 		}
-		
+
 		
 		if (finalFloorNum - elevator.getCurrentFloor() > 0)
 		{
@@ -136,6 +137,7 @@ public class ElevatorSubsystem extends Thread
 	private void getInstructions()
 	{
 		instruction = scheduler.getInstructionForElevator();
+		System.out.println(" ");
 		System.out.println("ElevatorSubsystem received Intructions: "+instruction);
 	}
 	

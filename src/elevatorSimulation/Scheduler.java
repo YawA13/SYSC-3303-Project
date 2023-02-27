@@ -110,7 +110,7 @@ public class Scheduler extends Thread
 		while (activeInstructions.size() == 0 && pendingInstructions.size() == 0)
 		{
 			try { 
-				System.out.println("wait in getInstructionForElevator");
+				System.out.println("Elevator waiting for Instruction");
                 wait();
             } catch (InterruptedException e) {
                 System.err.println(e);
@@ -121,42 +121,28 @@ public class Scheduler extends Thread
 		System.out.println("Scheduler sending instructions to elevator");
 		notifyAll();
 		
-		if (activeInstructions.size() > 0)
+		if (activeInstructions.size() <= 0)
 		{
-			state = SchedulerStates.Waiting;
-			return activeInstructions.get(0);
+			activeInstructions.add(pendingInstructions.get(0));
+			pendingInstructions.remove(pendingInstructions.get(0));
 		}
-		else
-		{
-			state = SchedulerStates.Waiting;
-			return pendingInstructions.get(0);
-		}
+		
+
+		state = SchedulerStates.Waiting;
+		return activeInstructions.get(0);
+
 		
 		
 	}
 
-	public synchronized void elevatorFinished(Instruction instruction) 
+	public void elevatorFinished(Instruction instruction) 
 	{
-		//While there are instructions available wait 
-		while (activeInstructions.size() == 0)
-		{
-			try { 
-				System.out.println("wait in elevatorFinished");
-                wait();
-            } catch (InterruptedException e) {
-                System.err.println(e);
-            }
-		}
-		
-		System.out.println("Scheduler received the finished instructions from elevator");
-		//activeInstructions.remove(instruction);
-		notifyAll(); //Notify synchronized methods
-		
+		System.out.println("Scheduler has been notified that finished elevator has finished its instructions");
 	}
 	
 	public synchronized boolean checkElevatorLocation(int elevatorLocation) 
 	{
-		System.out.println("Check elevaor method running");
+
 		boolean stopElevator = false;
 		//While there are instructions available wait 
 		while (activeInstructions.size() == 0)
@@ -169,15 +155,7 @@ public class Scheduler extends Thread
             }
 		}
 		
-		for (int i = 0; i < activeInstructions.size(); i++)
-		{
-			if (activeInstructions.get(i).getCarButton() == elevatorLocation)
-			{
-				activeInstructions.remove(activeInstructions.get(i));
-				floorLastArrived = elevatorLocation;
-				stopElevator =  true;
-			}
-		}
+
 		
 		for (int i = 0; i < pendingInstructions.size(); i++)
 		{
@@ -190,6 +168,22 @@ public class Scheduler extends Thread
 			}
 		}
 		
+		for (int i = 0; i < activeInstructions.size(); i++)
+		{
+			if (activeInstructions.get(i).getFloor() == elevatorLocation)
+			{
+				//floorLastArrived = elevatorLocation;
+				stopElevator =  true;
+			}
+			
+			else if (activeInstructions.get(i).getCarButton() == elevatorLocation)
+			{
+				activeInstructions.remove(activeInstructions.get(i));
+				floorLastArrived = elevatorLocation;
+				stopElevator =  true;
+			}
+			
+		}
 		
 		notifyAll(); //Notify synchronized methods
 		return stopElevator;

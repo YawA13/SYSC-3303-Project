@@ -1,0 +1,21 @@
+Elevator starts at dooropen state, which calls the getinstruction if there no instructions. and chages the state to closing once an instruction is given.
+
+Floorsystem, creates each floor based off the number inputted. Then it reads the input file and creates instructions object for each instruction. then for each instruction adds it to the assigned floor set of instructions, and sets the time after initial field in each instruction. Then tells each floor to start the request thread.
+
+ 
+
+each floor has a floor request, which takes the floor and queue of instructions. when the floor request is run, it has a while loop until there is nor more instructions for the floor. In while loop it takes the first in the queue and removes it, then tells the thread sleep until that time minus time that has already passed. Which is just adding the previous times it waited. Once it done sleeping the floor request send a message to the floor which send message to the floorsystem to tell the scheduler.
+
+ 
+
+scheduler then adds the instruction to activeinstruction if no instructions current or to the pending list.
+
+The getinstructionforelevator that would be called from elevator is not blocked anymore and the first instruction in active or pending are told to elevator.
+
+ not after elevator door is closed the direction of the motor is found. If there are no passengers it looks at the floor button of the instruction to pickup  a passenger, and if there are passengers it looks at the car button of the instruction. then checks if floor to go to is higher it goes and up and vice versa and sets the state accordingly. Then within the elevator moveDown or up method, the floornum increment by 1 and the thread sleeps for one second. After one second it goes to the arriving state which elevator ask scheduler if it needs to stop.
+
+In check, the scheduler checks all active instructions carbutton if it needs to stop. then checks the pendingrequest floorbutton is equal to the current and floor and going same direction as elevator and moves the instruction active and stops the elevator.
+
+ 
+
+if yes then doorsopen and numofpassengers is toggled to 0 or 1 depending on previous num. if not final, then it goes to it last state of moving up or down. During doorsipen it check if the current floor is at destination of the last floorbutton and reset the elevator instruction. 

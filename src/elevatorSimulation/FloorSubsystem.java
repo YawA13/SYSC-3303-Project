@@ -84,7 +84,6 @@ public class FloorSubsystem extends Thread
 	 */
 	public void sendInstruction(Instruction newInstruction)
 	{
-		System.out.println("FloorSubsystem sending instructions, "+newInstruction);
 		scheduler.setInstructionsFromFloor(newInstruction);
 	}
 	

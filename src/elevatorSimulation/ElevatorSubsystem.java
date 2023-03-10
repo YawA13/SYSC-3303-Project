@@ -125,7 +125,8 @@ public class ElevatorSubsystem extends Thread
 		}
 		else
 		{
-			state = ElevatorStates.DoorsOpening;	
+			scheduler.checkElevatorLocation(elevator.getCurrentFloor());
+			state = ElevatorStates.DoorsOpening;
 		}
 		
 	}

@@ -98,7 +98,6 @@ public class Floor
 	
 	public void sendLatestRequestToSubsystem(Instruction currentRequest)
 	{
-		System.out.println("Floor"+this.floorNum+": sendInstructions");
 		floorSubsystem.sendInstruction(currentRequest);
 	}
 	

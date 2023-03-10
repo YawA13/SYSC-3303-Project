@@ -27,8 +27,7 @@ public class FloorRequest extends Thread
 		{
 			Instruction currentRequest = requests.remove();
 			long timeToNextRequest = currentRequest.getTimeAfterInital() - timePassed;
-			System.out.println("FloorRequest "+floor.getFloorNum()+": going to sleep till " + timeToNextRequest);
-			
+
 			try {
 				Thread.sleep(timeToNextRequest);
 			} catch (InterruptedException e) {

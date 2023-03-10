@@ -1,4 +1,5 @@
 Time	Floor	Floor Button	Car Button
-14:05:15.0	2	Up	3
-14:05:16.0	4	down	3	
-14:05:17.0	4	up	5
+14:05:15.0	2	Up	4
+14:05:16.0	3	down	2	
+14:05:17.0	3	Up	4
+14:05:18.0	4	down	1

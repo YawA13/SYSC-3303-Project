@@ -28,8 +28,10 @@ public class Scheduler extends Thread
 	private SchedulerStates state;
 	
 	//used for floor last arrived, since we remove the active before we check if finnal dest.Note maybe use line 152 instead
-	private int floorLastArrived;
+	private int elevatorFinalDest;
 	
+	
+	private ElevatorSubsystem elevatorSubsystem;
 	
 	
 	/**
@@ -40,9 +42,13 @@ public class Scheduler extends Thread
 		pendingInstructions = new ArrayList<Instruction>(); 
 		activeInstructions = new ArrayList<Instruction> (); 
 		state = SchedulerStates.Waiting;
-		floorLastArrived = 1;
+		elevatorFinalDest = 1;
 	}
 	
+	public void setElevatorSubsystem(ElevatorSubsystem elevatorSubsystem)
+	{
+		this.elevatorSubsystem = elevatorSubsystem;
+	}
 	/**
 	 * Scheduler thread that does nothing in this iteration
 	 */
@@ -129,6 +135,7 @@ public class Scheduler extends Thread
 		
 
 		state = SchedulerStates.Waiting;
+		elevatorFinalDest = activeInstructions.get(0).getCarButton();
 		return activeInstructions.get(0);
 
 		
@@ -157,29 +164,32 @@ public class Scheduler extends Thread
 		
 
 		
-		for (int i = 0; i < pendingInstructions.size(); i++)
+		for (int i = pendingInstructions.size() -1; i >= 0; --i)
 		{
 			if ((pendingInstructions.get(i).getFloor() == elevatorLocation) 
 					&& (pendingInstructions.get(i).getButtonStatus() == activeInstructions.get(0).getButtonStatus()))
 			{
 				activeInstructions.add(pendingInstructions.get(i));
 				pendingInstructions.remove(pendingInstructions.get(i));
-				stopElevator = true;
+				stopElevator = true;	
 			}
 		}
 		
-		for (int i = 0; i < activeInstructions.size(); i++)
+		
+		for (int i = activeInstructions.size()-1; i >= 0 ; --i)
 		{
 			if (activeInstructions.get(i).getFloor() == elevatorLocation)
 			{
 				//floorLastArrived = elevatorLocation;
+				elevatorSubsystem.incrementEelevator();
 				stopElevator =  true;
 			}
 			
-			else if (activeInstructions.get(i).getCarButton() == elevatorLocation)
+			else if (activeInstructions.get(i).getCarButton() == elevatorLocation &&
+					elevatorSubsystem.getElevatorButtonStatus() == activeInstructions.get(i).getButtonStatus())
 			{
 				activeInstructions.remove(activeInstructions.get(i));
-				floorLastArrived = elevatorLocation;
+				elevatorSubsystem.decrementEelevator();
 				stopElevator =  true;
 			}
 			
@@ -192,11 +202,7 @@ public class Scheduler extends Thread
 	
 	public int getElevatorFinalDest()
 	{
-		if (activeInstructions.isEmpty())
-		{
-			return floorLastArrived;
-		}
-		return activeInstructions.get(0).getCarButton();
+		return elevatorFinalDest;
 	}
 	
 }

@@ -27,6 +27,7 @@ public class ElevatorSubsystem extends Thread
 		this.scheduler = scheduler;
 		this.state = ElevatorStates.DoorsOpen;
 		this.elevator = new Elevator(floors, this);
+		this.scheduler.setElevatorSubsystem(this);
 	}
 	
 	/**
@@ -50,7 +51,7 @@ public class ElevatorSubsystem extends Thread
 					state = ElevatorStates.DoorsClosing;
 					break;
 				case DoorsClosing:
-					System.out.println("ElevatorSubsystem state: DoorsClosing, at floor"+ elevator.currentFloor);
+					System.out.println("ElevatorSubsystem state: DoorsClosing, at floor"+ elevator.currentFloor + ", Num Of Passenegers:"+elevator.getNumOfPassengers());
 					//TODO setLightsAndStatus()
 					setDirection();	
 					break;
@@ -73,7 +74,6 @@ public class ElevatorSubsystem extends Thread
 					boolean atDestination = scheduler.checkElevatorLocation(elevator.getCurrentFloor());
 					if(atDestination)
 					{
-						elevator.toggleNumOfPassengers();
 						state = ElevatorStates.DoorsOpening;			
 					}
 					else
@@ -157,6 +157,19 @@ public class ElevatorSubsystem extends Thread
 		getInstructions(); 
 	}
 	
-
+	public void incrementEelevator()
+	{
+		elevator.setNumOfPassengers(elevator.getNumOfPassengers()+1);
+	}
+	
+	public void decrementEelevator()
+	{
+		elevator.setNumOfPassengers(elevator.getNumOfPassengers()-1);
+	}
+	
+	public ButtonStatus getElevatorButtonStatus()
+	{
+		return elevator.getbStatus();
+	}
 
 }

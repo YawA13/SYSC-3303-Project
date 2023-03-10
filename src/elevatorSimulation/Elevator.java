@@ -3,20 +3,20 @@ package elevatorSimulation;
 import java.util.ArrayList;
 
 public class Elevator {
-	ButtonStatus bStatus; 
-	ArrayList<Boolean> elevatorButtonLamps;
-	Boolean motorOn; // true = on, false = off
-	Boolean doorOpen; // true = open, false = closed 
+	private ButtonStatus direction; 
+	private ArrayList<Boolean> elevatorButtonLamps;
+	private Boolean motorOn; // true = on, false = off
+	private Boolean doorOpen; // true = open, false = closed 
 	
 	ElevatorSubsystem subsystem; 
 	
-	int currentFloor; 
+	private int currentFloor; 
 	private int numOfPassengers;
 	
 	public Elevator(int floors, ElevatorSubsystem subsystem) {
 		elevatorButtonLamps = new ArrayList<>();
 		currentFloor = 1; 
-		bStatus = ButtonStatus.Off;
+		direction = ButtonStatus.Off;
 		
 		for(int i = 0; i < floors; i++) {
 			elevatorButtonLamps.add(false); 
@@ -27,28 +27,27 @@ public class Elevator {
 		numOfPassengers = 0;
 	}
 
-	public void moving(ButtonStatus bStatus, int destination)
+	public void moving(ButtonStatus bStatus)
 	{
 		motorOn = true;
 		doorOpen = false;
-		this.bStatus = bStatus;
-		elevatorButtonLamps.set(destination-1, true);
+		this.direction = bStatus;
 	}
 	
 	public void resetElevator()
 	{
 		motorOn = false; 
-		doorOpen = true; 
-		this.bStatus = ButtonStatus.Off;
-		elevatorButtonLamps.set(currentFloor-1, false);
+		//doorOpen = true; 
+		this.direction = ButtonStatus.Off;
+		//turnButtonLamp(currentFloor, false);
 	}
 	
-	public ButtonStatus getbStatus() {
-		return bStatus;
+	public ButtonStatus getDirection() {
+		return direction;
 	}
 
-	public void setbStatus(ButtonStatus bStatus) {
-		this.bStatus = bStatus;
+	public void setDirection(ButtonStatus bStatus) {
+		this.direction = bStatus;
 	}
 
 	public ArrayList<Boolean> getElevatorButtonLamps() {
@@ -57,6 +56,11 @@ public class Elevator {
 
 	public void setElevatorButtonLamps(ArrayList<Boolean> elevatorButtonLamps) {
 		this.elevatorButtonLamps = elevatorButtonLamps;
+	}
+	
+	public void turnButtonLamp(int buttonNum, boolean lampStatus )
+	{
+		elevatorButtonLamps.set(buttonNum -1, lampStatus);
 	}
 
 	public Boolean getMotorOn() {
@@ -113,5 +117,16 @@ public class Elevator {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+	}
+	
+	public String getStatus()
+	{
+		String status = "{Direction: "+direction 
+							+", numOfPassengers: " +numOfPassengers
+							+", buttonLamps: " +elevatorButtonLamps
+							+", motorOn: "+motorOn 
+							+", doorOpen: "+doorOpen 	
+							+"}";
+		return status;
 	}
 }

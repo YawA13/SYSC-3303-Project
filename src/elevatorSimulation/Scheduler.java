@@ -1,7 +1,9 @@
 package elevatorSimulation;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Code to create Scheduler thread object for Milestone 1 SYSC 3303.
@@ -163,16 +165,21 @@ public class Scheduler extends Thread
 		}
 		
 
-		
+		Set<Integer> activeInstructCarButtons = new HashSet<Integer>();
 		for (int i = pendingInstructions.size() -1; i >= 0; --i)
 		{
 			if ((pendingInstructions.get(i).getFloor() == elevatorLocation) 
 					&& (pendingInstructions.get(i).getButtonStatus() == activeInstructions.get(0).getButtonStatus()))
 			{
 				activeInstructions.add(pendingInstructions.get(i));
+				activeInstructCarButtons.add(pendingInstructions.get(i).getCarButton());
 				pendingInstructions.remove(pendingInstructions.get(i));
 				stopElevator = true;	
 			}
+		}
+		
+		if(activeInstructCarButtons.size() > 0) {
+			elevatorSubsystem.turnButtonLampOn(activeInstructCarButtons);
 		}
 		
 		
@@ -186,7 +193,7 @@ public class Scheduler extends Thread
 			}
 			
 			else if (activeInstructions.get(i).getCarButton() == elevatorLocation &&
-					elevatorSubsystem.getElevatorButtonStatus() == activeInstructions.get(i).getButtonStatus())
+					elevatorSubsystem.getElevatorDirection() == activeInstructions.get(i).getButtonStatus())
 			{
 				activeInstructions.remove(activeInstructions.get(i));
 				elevatorSubsystem.decrementEelevator();

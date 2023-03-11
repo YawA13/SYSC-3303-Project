@@ -126,7 +126,7 @@ public class Scheduler extends Thread
 		while (activeInstructions.size() == 0 && pendingInstructions.size() == 0)
 		{
 			try { 
-				System.out.println("Elevator waiting for Instruction");
+				System.out.println("Elevator "+elevatorCarNum +"waiting for Instruction");
                 wait();
             } catch (InterruptedException e) {
                 System.err.println(e);
@@ -135,15 +135,22 @@ public class Scheduler extends Thread
 		
 		state = SchedulerStates.ProcessRequest;
 		System.out.println("Scheduler sending instructions to elevator");
-		notifyAll();
+
 		
+		Instruction newInstruction = null;
 		if (activeInstructions.size() <= 0)
 		{
+			newInstruction = pendingInstructions.get(0);
 			pendingInstructions.remove(pendingInstructions.get(0));
+		}
+		else
+		{
+			newInstruction = activeInstructions.get(0);
 		}
 		
 		state = SchedulerStates.Waiting;
-		return activeInstructions.get(0);
+		notifyAll();
+		return newInstruction;
 		
 	}
 
@@ -167,6 +174,7 @@ public class Scheduler extends Thread
                 System.err.println(e);
             }
 		}
+		
 		
 		int elevatorLocation = elevatorSubsystems.get(elevatorCarNum).getCurrentLocation();
 		

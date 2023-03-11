@@ -50,38 +50,41 @@ public class ElevatorSubsystem extends Thread
 			switch (state)
 			{
 				case DoorsOpen:
-					System.out.println("ElevatorSubsystem state: DoorsOpen, at floor"+ elevator.getCurrentFloor());
-					System.out.println("\tStatus: "+elevator.getStatus());
+					System.out.println("ElevatorSubsystem " +carNumber +" state: DoorsOpen, at floor"+ elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
 					if (instruction == null)
 					{
 						getInstructions();
 						elevator.setElevatorFinalDest(activeInstructions.get(0).getCarButton());
-						elevator.turnButtonLamp(instruction.getCarButton(), true);
 					}	
 					elevator.setDoorOpen(false);
 					state = ElevatorStates.DoorsClosing;
 					break;
 				case DoorsClosing:
-					System.out.println("ElevatorSubsystem state: DoorsClosing, at floor:"+ elevator.getCurrentFloor());
+					System.out.println("ElevatorSubsystem "+carNumber +" state: DoorsClosing, at floor:"+ elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
 					setDirection();	
 					break;
 				case MovingUp:
 					//timer
 					elevator.moveUp();
-					System.out.println("ElevatorSubsystem state: MovingUp, at floor"+ elevator.getCurrentFloor());
+					System.out.println("ElevatorSubsystem "+carNumber +" state: MovingUp, at floor"+ elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
 					stateBeforeArriving = ElevatorStates.MovingUp;
 					state = ElevatorStates.Arriving;
 					break;
 				case MovingDown:
 					//timer 
 					elevator.moveDown();
-					System.out.println("ElevatorSubsystem state: MovingDown, at floor"+ elevator.getCurrentFloor());
+					System.out.println("ElevatorSubsystem "+carNumber +" state: MovingDown, at floor"+ elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
 					stateBeforeArriving = ElevatorStates.MovingDown;
 					state = ElevatorStates.Arriving;
 					break;
 				case Arriving:
-					System.out.println("ElevatorSubsystem state: Arriving, at floor"+ elevator.getCurrentFloor());
-					boolean atDestination = scheduler.checkElevatorLocation(elevator.getCurrentFloor());
+					System.out.println("ElevatorSubsystem " +carNumber +" state: Arriving, at floor"+ elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
+					boolean atDestination = scheduler.checkElevatorLocation(carNumber);
 					if(atDestination)
 					{
 						state = ElevatorStates.DoorsOpening;			
@@ -92,7 +95,8 @@ public class ElevatorSubsystem extends Thread
 					}
 					break;
 				case DoorsOpening:
-					System.out.println("ElevatorSubsystem state: DoorsOpening, at floor" + elevator.getCurrentFloor());
+					System.out.println("ElevatorSubsystem "+carNumber +" state: DoorsOpening, at floor" + elevator.getCurrentFloor());
+					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
 					if (elevator.getCurrentFloor() == elevator.getElevatorFinalDest())
 					{
 						System.out.println("ElevatorSubsystem: Elevator Done");
@@ -136,7 +140,7 @@ public class ElevatorSubsystem extends Thread
 		}
 		else
 		{
-			scheduler.checkElevatorLocation(elevator.getCurrentFloor());
+			scheduler.checkElevatorLocation(carNumber);
 			state = ElevatorStates.DoorsOpening;
 		}
 		
@@ -149,9 +153,9 @@ public class ElevatorSubsystem extends Thread
 	private void getInstructions()
 	{
 		instruction = scheduler.getInstructionForElevator(carNumber);
-		activeInstructions.add(instruction);
+		addToActiveInstructions(instruction);
 		System.out.println(" ");
-		System.out.println("ElevatorSubsystem received Intructions: "+instruction);
+		System.out.println("ElevatorSubsystem "+carNumber +" received Intructions: "+instruction);
 	}
 	
 

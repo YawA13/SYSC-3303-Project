@@ -1,5 +1,7 @@
 package elevatorSimulation;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -17,18 +19,22 @@ public class ElevatorSubsystem extends Thread
 	private Instruction instruction;
 	private ElevatorStates state;
 	private Elevator elevator;
+	private List <Instruction> activeInstructions;
+	private int carNumber;
 	
 	/**
 	 * Initialize Elevator subsystem
 	 * 
 	 * @param scheduler Object to synchronize information between elevator and floor class
 	 */
-	public ElevatorSubsystem (Scheduler scheduler, int floors)
+	public ElevatorSubsystem (Scheduler scheduler, int floors, int carNumber)
 	{
 		this.scheduler = scheduler;
 		this.state = ElevatorStates.DoorsOpen;
 		this.elevator = new Elevator(floors, this);
 		this.scheduler.setElevatorSubsystem(this);
+		this.carNumber = carNumber;
+		this.activeInstructions = new ArrayList<Instruction>();
 	}
 	
 	/**
@@ -49,6 +55,7 @@ public class ElevatorSubsystem extends Thread
 					if (instruction == null)
 					{
 						getInstructions();
+						elevator.setElevatorFinalDest(activeInstructions.get(0).getCarButton());
 						elevator.turnButtonLamp(instruction.getCarButton(), true);
 					}	
 					elevator.setDoorOpen(false);
@@ -86,7 +93,7 @@ public class ElevatorSubsystem extends Thread
 					break;
 				case DoorsOpening:
 					System.out.println("ElevatorSubsystem state: DoorsOpening, at floor" + elevator.getCurrentFloor());
-					if (elevator.getCurrentFloor() == scheduler.getElevatorFinalDest())
+					if (elevator.getCurrentFloor() == elevator.getElevatorFinalDest())
 					{
 						System.out.println("ElevatorSubsystem: Elevator Done");
 						scheduler.elevatorFinished(instruction);
@@ -94,7 +101,6 @@ public class ElevatorSubsystem extends Thread
 						elevator.resetElevator();
 					}
 					
-					elevator.turnButtonLamp(elevator.getCurrentFloor(), false);
 					elevator.setDoorOpen(true);
 					state = ElevatorStates.DoorsOpen;
 					break;
@@ -142,7 +148,8 @@ public class ElevatorSubsystem extends Thread
 	 */
 	private void getInstructions()
 	{
-		instruction = scheduler.getInstructionForElevator();
+		instruction = scheduler.getInstructionForElevator(carNumber);
+		activeInstructions.add(instruction);
 		System.out.println(" ");
 		System.out.println("ElevatorSubsystem received Intructions: "+instruction);
 	}
@@ -186,4 +193,25 @@ public class ElevatorSubsystem extends Thread
 		}
 	}
 
+	public List<Instruction> getActiveInstructions()
+	{
+		return activeInstructions;
+	}
+	
+	public void addToActiveInstructions(Instruction newInstruction)
+	{
+		activeInstructions.add(newInstruction);
+		elevator.turnButtonLamp(newInstruction.getCarButton(), true);
+	}
+	
+	public int getCurrentLocation()
+	{
+		return elevator.getCurrentFloor();
+	}
+
+	public void removeActiveInstruction(Instruction newInstruction) {
+		// TODO Auto-generated method stub
+		activeInstructions.remove(newInstruction);
+		elevator.turnButtonLamp(newInstruction.getCarButton(), false);
+	}
 }

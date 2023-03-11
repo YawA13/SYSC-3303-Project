@@ -8,10 +8,12 @@ public class Elevator {
 	private Boolean motorOn; // true = on, false = off
 	private Boolean doorOpen; // true = open, false = closed 
 	
-	ElevatorSubsystem subsystem; 
+	private ElevatorSubsystem subsystem; 
 	
 	private int currentFloor; 
 	private int numOfPassengers;
+	
+	private int elevatorFinalDest;
 	
 	public Elevator(int floors, ElevatorSubsystem subsystem) {
 		elevatorButtonLamps = new ArrayList<>();
@@ -25,6 +27,7 @@ public class Elevator {
 		doorOpen = true; 
 		this.subsystem = subsystem;
 		numOfPassengers = 0;
+		elevatorFinalDest = 1;
 	}
 
 	public void moving(ButtonStatus bStatus)
@@ -128,5 +131,15 @@ public class Elevator {
 							+", doorOpen: "+doorOpen 	
 							+"}";
 		return status;
+	}
+	
+	public void setElevatorFinalDest(int dest)
+	{
+		elevatorFinalDest = dest;
+	}
+	
+	public int getElevatorFinalDest()
+	{
+		return elevatorFinalDest;
 	}
 }

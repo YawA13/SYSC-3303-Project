@@ -15,12 +15,14 @@ public class ElevatorSimulation {
 		int numOfFloors = 5;
 		Thread scheduler = new Scheduler ();
 		//Create Elevator and floor objects and pass scheduler to constructor to share information between them 
-		Thread elevatorSubsytem = new ElevatorSubsystem ((Scheduler) scheduler, numOfFloors);
+		Thread elevatorSubsytem = new ElevatorSubsystem ((Scheduler) scheduler, numOfFloors, 0);
+		Thread elevatorSubsytem2 = new ElevatorSubsystem ((Scheduler) scheduler, numOfFloors, 1);
 		Thread floorSubsystem = new FloorSubsystem ((Scheduler) scheduler, "InputInstructions.txt", numOfFloors);
 		
 		//Start all threads
 		scheduler.start();
 		elevatorSubsytem.start();
+		elevatorSubsytem2.start();
 		floorSubsystem.start();
 		
 		

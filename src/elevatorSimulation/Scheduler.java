@@ -91,22 +91,7 @@ public class Scheduler extends Thread
 		}
 		
 		System.out.println("Scheduler received instructions from floor");
-		
-		boolean emptyActive = false;
-		for (int i = 0; i < elevatorSubsystems.size(); i++)
-		{
-			if(elevatorSubsystems.get(i).getActiveInstructions().isEmpty() && !emptyActive)
-			{
-				elevatorSubsystems.get(i).addToActiveInstructions(instruction);
-				emptyActive = true;
-			}
-		}
-		
-		if (!emptyActive)
-		{
-			this.pendingInstructions.add(instruction); //Save instruction object
-		}
-		
+		this.pendingInstructions.add(instruction); //Save instruction object
 		notifyAll(); //Notify synchronized methods
 	}
 
@@ -126,7 +111,7 @@ public class Scheduler extends Thread
 		while (activeInstructions.size() == 0 && pendingInstructions.size() == 0)
 		{
 			try { 
-				System.out.println("Elevator "+elevatorCarNum +"waiting for Instruction");
+				System.out.println("Elevator "+elevatorCarNum +" waiting for Instruction");
                 wait();
             } catch (InterruptedException e) {
                 System.err.println(e);
@@ -137,17 +122,9 @@ public class Scheduler extends Thread
 		System.out.println("Scheduler sending instructions to elevator");
 
 		
-		Instruction newInstruction = null;
-		if (activeInstructions.size() <= 0)
-		{
-			newInstruction = pendingInstructions.get(0);
-			pendingInstructions.remove(pendingInstructions.get(0));
-		}
-		else
-		{
-			newInstruction = activeInstructions.get(0);
-		}
-		
+		Instruction newInstruction = pendingInstructions.get(0);
+		pendingInstructions.remove(0);
+	
 		state = SchedulerStates.Waiting;
 		notifyAll();
 		return newInstruction;

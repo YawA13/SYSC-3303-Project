@@ -50,8 +50,7 @@ public class ElevatorSubsystem extends Thread
 			switch (state)
 			{
 				case DoorsOpen:
-					System.out.println("ElevatorSubsystem " +carNumber +" state: DoorsOpen, at floor"+ elevator.getCurrentFloor());
-					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
+					System.out.println("ElevatorSubsystem " +carNumber +" state: DoorsOpen, at floor"+ elevator.getCurrentFloor()+"\n\tStatus " +carNumber +": "+elevator.getStatus());
 					if (instruction == null)
 					{
 						getInstructions();
@@ -153,9 +152,7 @@ public class ElevatorSubsystem extends Thread
 	private void getInstructions()
 	{
 		instruction = scheduler.getInstructionForElevator(carNumber);
-		addToActiveInstructions(instruction);
-		System.out.println(" ");
-		System.out.println("ElevatorSubsystem "+carNumber +" received Intructions: "+instruction);
+		addToActiveInstructions(instruction);	
 	}
 	
 
@@ -206,6 +203,7 @@ public class ElevatorSubsystem extends Thread
 	{
 		activeInstructions.add(newInstruction);
 		elevator.turnButtonLamp(newInstruction.getCarButton(), true);
+		System.out.println("ElevatorSubsystem "+carNumber +" added instruction" +newInstruction+"\n");
 	}
 	
 	public int getCurrentLocation()
@@ -217,5 +215,7 @@ public class ElevatorSubsystem extends Thread
 		// TODO Auto-generated method stub
 		activeInstructions.remove(newInstruction);
 		elevator.turnButtonLamp(newInstruction.getCarButton(), false);
+		System.out.println("ElevatorSubsystem "+carNumber +" finished instruction" +newInstruction +"\n");
+		
 	}
 }

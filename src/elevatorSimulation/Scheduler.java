@@ -1,8 +1,10 @@
 package elevatorSimulation;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -29,25 +31,26 @@ public class Scheduler extends Thread
 	//private List <Instruction> activeInstructions;
 	private SchedulerStates state;
 	
-	private List<ElevatorSubsystem> elevatorSubsystems;
 	private FloorSubsystem floorSubsystem;
+	private Map<Integer, ArrayList<Instruction>> allActiveInstructions;
 	
 	
 	/**
 	 * Initialize scheduler object
 	 */
-	public Scheduler()
+	public Scheduler(int numOfElevators)
 	{
-		this.elevatorSubsystems = new ArrayList<>();
+		allActiveInstructions = new HashMap<>();
+		for (int i = 0; i < numOfElevators; i++)
+		{
+			allActiveInstructions.put(i, new ArrayList<>());
+		}
+		
 		pendingInstructions = new ArrayList<Instruction>(); 
 		state = SchedulerStates.Waiting;
 	
 	}
 	
-	public void setElevatorSubsystem(ElevatorSubsystem elevatorSubsystem)
-	{
-		this.elevatorSubsystems.add(elevatorSubsystem);
-	}
 	
 	public void setFloorSubsystem(FloorSubsystem floorSubsystem)
 	{
@@ -110,7 +113,7 @@ public class Scheduler extends Thread
 		//While there are no instructions for elevator wait
 		//state = SchedulerStates.ProcessRequest;
 		
-		List<Instruction> activeInstructions = elevatorSubsystems.get(elevatorCarNum).getActiveInstructions();
+		List<Instruction> activeInstructions = allActiveInstructions.get(elevatorCarNum);
 		
 		while (activeInstructions.size() == 0 && pendingInstructions.size() == 0)
 		{
@@ -125,10 +128,17 @@ public class Scheduler extends Thread
 		state = SchedulerStates.ProcessRequest;
 		System.out.println("Scheduler sending instructions to elevator");
 
+		Instruction newInstruction;
+		if(activeInstructions.isEmpty())
+		{
+			newInstruction = pendingInstructions.remove(0);
+			activeInstructions.add(newInstruction);
+		}
+		else
+		{
+			newInstruction = activeInstructions.get(0);
+		}
 		
-		Instruction newInstruction = pendingInstructions.get(0);
-		pendingInstructions.remove(0);
-	
 		state = SchedulerStates.Waiting;
 		notifyAll();
 		return newInstruction;
@@ -140,10 +150,10 @@ public class Scheduler extends Thread
 		System.out.println("Scheduler has been notified that finished elevator has finished its instructions");
 	}
 	
-	public synchronized boolean checkElevatorLocation(int elevatorCarNum) 
+	public synchronized int [] checkElevatorLocation(int elevatorCarNum, int elevatorLocation, ButtonStatus elevatorDirection) 
 	{
 
-		List<Instruction> activeInstructions = elevatorSubsystems.get(elevatorCarNum).getActiveInstructions();
+		List<Instruction> activeInstructions = allActiveInstructions.get(elevatorCarNum);
 		boolean stopElevator = false;
 		//While there are instructions available wait 
 		while (activeInstructions.size() == 0)
@@ -157,37 +167,42 @@ public class Scheduler extends Thread
 		}
 		
 		
-		int elevatorLocation = elevatorSubsystems.get(elevatorCarNum).getCurrentLocation();
-		
+		int stop = 0;
+		int increment = 0;
+		int decrement = 0;
+		//list of floor lamps false
+		//list of floor lamps true
 		
 		for (int i = pendingInstructions.size() -1; i >= 0; --i)
 		{
 			if ((pendingInstructions.get(i).getFloor() == elevatorLocation) 
 					&& (pendingInstructions.get(i).getButtonStatus() == activeInstructions.get(0).getButtonStatus()))
 			{
-				elevatorSubsystems.get(elevatorCarNum).addToActiveInstructions((pendingInstructions.get(i)));
+				//add to floor lamps for true
+				activeInstructions.add((pendingInstructions.get(i)));
 				pendingInstructions.remove(pendingInstructions.get(i));
-				stopElevator = true;	
+				stop = 1;	
 			}
 		}
 		
-		ButtonStatus directionFloor = elevatorSubsystems.get(elevatorCarNum).getElevatorDirection();
+		ButtonStatus directionFloor = elevatorDirection;
 		for (int i = activeInstructions.size()-1; i >= 0 ; --i)
 		{
 			if (activeInstructions.get(i).getFloor() == elevatorLocation)
 			{
 				//floorLastArrived = elevatorLocation;
-				elevatorSubsystems.get(elevatorCarNum).incrementEelevator();
+				increment++;
 				directionFloor = activeInstructions.get(i).getButtonStatus();
-				stopElevator =  true;
+				stop = 1;
 			}
 			
 			else if (activeInstructions.get(i).getCarButton() == elevatorLocation &&
-					elevatorSubsystems.get(elevatorCarNum).getElevatorDirection() == activeInstructions.get(i).getButtonStatus())
+					elevatorDirection == activeInstructions.get(i).getButtonStatus())
 			{
-				elevatorSubsystems.get(elevatorCarNum).removeActiveInstruction(activeInstructions.get(i));
-				elevatorSubsystems.get(elevatorCarNum).decrementEelevator();
-				stopElevator =  true;
+				//add to floor lamps false
+				activeInstructions.remove(activeInstructions.get(i));
+				decrement++;
+				stop =  1;
 			}
 			
 		}
@@ -195,9 +210,10 @@ public class Scheduler extends Thread
 		floorSubsystem.elevatorReachFloor(elevatorCarNum, elevatorLocation, directionFloor, stopElevator);
 		
 
+		int [] returnInt = {stop, increment, decrement}; //stop ( ==1), increment, decrement;  
 		
 		notifyAll(); //Notify synchronized methods
-		return stopElevator;
+		return returnInt;
 			
 	}
 	

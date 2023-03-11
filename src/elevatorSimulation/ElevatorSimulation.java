@@ -18,7 +18,7 @@ public class ElevatorSimulation {
 		
 		//Create Elevator and floor objects and pass scheduler to constructor to share information between them 
 		//Thread elevatorSubsytem = new ElevatorSubsystem ((Scheduler) scheduler, numOfFloors, 0);
-		Thread scheduler = new Scheduler ();
+		Thread scheduler = new Scheduler (numOfElevators);
 		ArrayList<Thread> elevatorSubsystems = new ArrayList<>();
 		Thread floorSubsystem = new FloorSubsystem ((Scheduler) scheduler, "InputInstructions.txt", numOfloors, numOfElevators);
 		

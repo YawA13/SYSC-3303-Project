@@ -19,7 +19,6 @@ public class ElevatorSubsystem extends Thread
 	private Instruction instruction;
 	private ElevatorStates state;
 	private Elevator elevator;
-	private List <Instruction> activeInstructions;
 	private int carNumber;
 	
 	/**
@@ -32,9 +31,7 @@ public class ElevatorSubsystem extends Thread
 		this.scheduler = scheduler;
 		this.state = ElevatorStates.DoorsOpen;
 		this.elevator = new Elevator(floors, this);
-		this.scheduler.setElevatorSubsystem(this);
 		this.carNumber = carNumber;
-		this.activeInstructions = new ArrayList<Instruction>();
 	}
 	
 	/**
@@ -54,7 +51,7 @@ public class ElevatorSubsystem extends Thread
 					if (instruction == null)
 					{
 						getInstructions();
-						elevator.setElevatorFinalDest(activeInstructions.get(0).getCarButton());
+						elevator.setElevatorFinalDest(instruction.getCarButton());
 					}	
 					elevator.setDoorOpen(false);
 					state = ElevatorStates.DoorsClosing;
@@ -83,8 +80,12 @@ public class ElevatorSubsystem extends Thread
 				case Arriving:
 					System.out.println("ElevatorSubsystem " +carNumber +" state: Arriving, at floor"+ elevator.getCurrentFloor());
 					//System.out.println("\tStatus " +carNumber +": "+elevator.getStatus());
-					boolean atDestination = scheduler.checkElevatorLocation(carNumber);
-					if(atDestination)
+					int [] msg = scheduler.checkElevatorLocation(carNumber, elevator.getCurrentFloor(), elevator.getDirection());
+					
+					elevator.setNumOfPassengers(elevator.getNumOfPassengers()+msg[1]);
+					elevator.setNumOfPassengers(elevator.getNumOfPassengers()-msg[2]);
+					
+					if(msg [0] == 1)
 					{
 						state = ElevatorStates.DoorsOpening;			
 					}
@@ -139,7 +140,11 @@ public class ElevatorSubsystem extends Thread
 		}
 		else
 		{
-			scheduler.checkElevatorLocation(carNumber);
+			int [] msg = scheduler.checkElevatorLocation(carNumber, elevator.getCurrentFloor(), elevator.getDirection());
+			
+			elevator.setNumOfPassengers(elevator.getNumOfPassengers()+msg[1]);
+			elevator.setNumOfPassengers(elevator.getNumOfPassengers()-msg[2]);
+			
 			state = ElevatorStates.DoorsOpening;
 		}
 		
@@ -194,14 +199,10 @@ public class ElevatorSubsystem extends Thread
 		}
 	}
 
-	public List<Instruction> getActiveInstructions()
-	{
-		return activeInstructions;
-	}
 	
 	public void addToActiveInstructions(Instruction newInstruction)
 	{
-		activeInstructions.add(newInstruction);
+		//activeInstructions.add(newInstruction);
 		elevator.turnButtonLamp(newInstruction.getCarButton(), true);
 		System.out.println("ElevatorSubsystem "+carNumber +" added instruction " +newInstruction+"\n");
 	}
@@ -213,7 +214,7 @@ public class ElevatorSubsystem extends Thread
 
 	public void removeActiveInstruction(Instruction newInstruction) {
 		// TODO Auto-generated method stub
-		activeInstructions.remove(newInstruction);
+		//activeInstructions.remove(newInstruction);
 		elevator.turnButtonLamp(newInstruction.getCarButton(), false);
 		System.out.println("ElevatorSubsystem "+carNumber +" finished instruction " +newInstruction +"\n");
 		

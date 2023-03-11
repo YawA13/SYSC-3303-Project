@@ -29,10 +29,8 @@ public class Scheduler extends Thread
 	//private List <Instruction> activeInstructions;
 	private SchedulerStates state;
 	
-
-	
-	
 	private List<ElevatorSubsystem> elevatorSubsystems;
+	private FloorSubsystem floorSubsystem;
 	
 	
 	/**
@@ -50,6 +48,12 @@ public class Scheduler extends Thread
 	{
 		this.elevatorSubsystems.add(elevatorSubsystem);
 	}
+	
+	public void setFloorSubsystem(FloorSubsystem floorSubsystem)
+	{
+		this.floorSubsystem = floorSubsystem;
+	}
+	
 	/**
 	 * Scheduler thread that does nothing in this iteration
 	 */
@@ -167,14 +171,14 @@ public class Scheduler extends Thread
 			}
 		}
 		
-		
-		
+		ButtonStatus directionFloor = elevatorSubsystems.get(elevatorCarNum).getElevatorDirection();
 		for (int i = activeInstructions.size()-1; i >= 0 ; --i)
 		{
 			if (activeInstructions.get(i).getFloor() == elevatorLocation)
 			{
 				//floorLastArrived = elevatorLocation;
 				elevatorSubsystems.get(elevatorCarNum).incrementEelevator();
+				directionFloor = activeInstructions.get(i).getButtonStatus();
 				stopElevator =  true;
 			}
 			
@@ -187,6 +191,10 @@ public class Scheduler extends Thread
 			}
 			
 		}
+		
+		floorSubsystem.elevatorReachFloor(elevatorCarNum, elevatorLocation, directionFloor, stopElevator);
+		
+
 		
 		notifyAll(); //Notify synchronized methods
 		return stopElevator;

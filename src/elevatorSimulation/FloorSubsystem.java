@@ -30,14 +30,15 @@ public class FloorSubsystem extends Thread
 	 * @param scheduler Scheduler object to synchronize information between elevator and floor class
 	 * @param inputLoc String location of text file to read
 	 */
-	public FloorSubsystem(Scheduler scheduler, String inputLoc, int numOfFloors)
+	public FloorSubsystem(Scheduler scheduler, String inputLoc, int numOfFloors, int numOfElevators)
 	{
 		this.scheduler = scheduler;
 		this.inputLoc = inputLoc;
+		this.scheduler.setFloorSubsystem(this);
 		instructions = new ArrayList<>(); //Initialize Array list to hold instruction's
 		for (int i = 0; i < numOfFloors; i++)
 		{
-			floors.add(new Floor(this, (i+1)));
+			floors.add(new Floor(this, (i+1), numOfElevators));
 		}
 	}
 	
@@ -143,4 +144,60 @@ public class FloorSubsystem extends Thread
 	public void testSendInstruciton(int n) {
 		sendInstruction(instructions.get(n)); 
 	}
+	
+	
+	/**
+	public void elevatorStopFloor(int elevatorCarNum, int currentFloorNum, Instruction currentRequest)
+	{
+		//Since arraylist, starts at 0 and floor start at 1
+		currentFloorNum--;
+		
+		//when reach floor set lamps for direction on, and floor lamp is turned off
+		floors.get(currentFloorNum).setLampWhenElevatorReachFloor(elevatorCarNum, currentRequest);
+		//floors.get(currentRequest.getFloor()).setLampWhenElevatorReachFloor(currentRequest);
+			
+		//for previous floor reached, set lamp for direction off
+		int previousFloor;
+		if ((currentRequest.getButtonStatus() == ButtonStatus.Up) && (currentFloorNum > 1))
+		{
+			previousFloor = currentFloorNum - 1;
+			floors.get(previousFloor).setLampWhenElevatorLeaves(elevatorCarNum);
+		}
+		else if (((currentRequest.getButtonStatus() == ButtonStatus.Down) && (currentFloorNum < floors.size() - 1)))
+		{
+			previousFloor = currentFloorNum + 1;
+			floors.get(previousFloor).setLampWhenElevatorLeaves(elevatorCarNum);
+		}
+			
+	}
+	**/
+	
+	public void elevatorReachFloor(int elevatorCarNum, int currentFloorNum, ButtonStatus currentDirection, boolean isElevatorStopping)
+	{
+		//Since arraylist, starts at 0 and floor start at 1
+		currentFloorNum--;
+		
+		//when reach floor set lamps for direction on, and floor lamp is turned off
+		floors.get(currentFloorNum).setLampWhenElevatorReachFloor(elevatorCarNum, currentDirection, isElevatorStopping);
+		//floors.get(currentRequest.getFloor()).setLampWhenElevatorReachFloor(currentRequest);
+			
+		//for previous floor reached, set lamp for direction off
+		
+		if ((currentFloorNum < floors.size() - 1) && (currentFloorNum > 0))
+		{
+			floors.get(currentFloorNum - 1).setLampWhenElevatorLeaves(elevatorCarNum);
+			floors.get(currentFloorNum + 1).setLampWhenElevatorLeaves(elevatorCarNum);
+		}
+		else if (currentFloorNum < floors.size() - 1)
+		{
+			floors.get(currentFloorNum+1).setLampWhenElevatorLeaves(elevatorCarNum);
+		}
+		else
+		{
+			floors.get(currentFloorNum - 1).setLampWhenElevatorLeaves(elevatorCarNum);
+		}
+			
+	}
+	
+	
 }

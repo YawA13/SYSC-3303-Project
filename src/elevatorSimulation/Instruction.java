@@ -86,7 +86,7 @@ public class Instruction {
 	@Override
 	public String toString()
 	{
-		String message = "Time:"+time+", Floor:"+floor+", Elevator Number:"+carButton
+		String message = "Time:"+time+", Floor:"+floor+", Car Button:"+carButton
 				+", Button:"+buttonStatus.toString();
 		return message;
 		

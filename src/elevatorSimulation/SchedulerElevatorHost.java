@@ -138,6 +138,13 @@ public class SchedulerElevatorHost extends Thread
 	         e.printStackTrace();
 	         System.exit(1);
 	      }
+		 
+	      try {
+		         sendReceiveSocket.send(sendPacket);
+		      } catch (IOException e) {
+		         e.printStackTrace();
+		         System.exit(1);
+		      }
 	}
 	
 	private ArrayList<String> checkRequest (byte [] request, int requestLength)

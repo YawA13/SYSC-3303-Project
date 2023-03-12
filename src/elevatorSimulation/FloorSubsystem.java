@@ -3,6 +3,12 @@ package elevatorSimulation;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
@@ -19,10 +25,23 @@ import java.util.Scanner;
 public class FloorSubsystem extends Thread
 {
 
-	private Scheduler scheduler; //variable to hold scheduler object
+	private String schedulerIp;
 	private String inputLoc; //variable to hold location of instructions text file
 	private List<Instruction> instructions; //variable to hold list of instructions from text file
 	private ArrayList<Floor> floors = new ArrayList<>();
+	private static final int RECEIVE_PORT = 50;
+	private static final int SENDER_PORT = 43;
+	/**
+	 * packets to receive and send data
+	 */
+   private DatagramPacket sendPacket, receivePacket;
+   
+   /**
+    * sockets to send and receive data
+    */
+   private DatagramSocket sendReceiveSocket;
+   
+   
 	
 	/**
 	 * Initialize Floor subsystem
@@ -30,16 +49,41 @@ public class FloorSubsystem extends Thread
 	 * @param scheduler Scheduler object to synchronize information between elevator and floor class
 	 * @param inputLoc String location of text file to read
 	 */
-	public FloorSubsystem(Scheduler scheduler, String inputLoc, int numOfFloors, int numOfElevators)
+	public FloorSubsystem(String schedulerIp, String inputLoc, int numOfFloors, int numOfElevators)
 	{
-		this.scheduler = scheduler;
+		this.schedulerIp = schedulerIp;
 		this.inputLoc = inputLoc;
-		this.scheduler.setFloorSubsystem(this);
 		instructions = new ArrayList<>(); //Initialize Array list to hold instruction's
 		for (int i = 0; i < numOfFloors; i++)
 		{
 			floors.add(new Floor(this, (i+1), numOfElevators));
 		}
+		
+		Thread floorSubsystemHost = new FloorSubsystemHost(schedulerIp, this);
+		floorSubsystemHost.start();
+		try {
+	         sendReceiveSocket = new DatagramSocket(RECEIVE_PORT);
+	      } catch (SocketException se) { 
+	         se.printStackTrace();
+	         System.exit(1);
+	      }
+	}
+	
+	private void send(byte [] request, int requestLength)
+	{
+		 try {
+	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(schedulerIp), SENDER_PORT);
+	      } catch (UnknownHostException e) {
+	         e.printStackTrace();
+	         System.exit(1);
+	      }
+		 
+	      try {
+		         sendReceiveSocket.send(sendPacket);
+		      } catch (IOException e) {
+		         e.printStackTrace();
+		         System.exit(1);
+		      }
 	}
 	
 	/**
@@ -47,7 +91,7 @@ public class FloorSubsystem extends Thread
 	 * array list of Instruction objects and send each instruction line to scheduler
 	 * and receive before moving to next instruction line. Program will then exit
 	 */
-	public void run()
+	public void startFloor()
 	{
 		readInput(); //Convert text file to list of instructions
 		
@@ -85,7 +129,9 @@ public class FloorSubsystem extends Thread
 	 */
 	public void sendInstruction(Instruction newInstruction)
 	{
-		scheduler.setInstructionsFromFloor(newInstruction);
+		String sendMsgtxt = newInstruction.getInputData();
+		byte [] sendMsg = sendMsgtxt.getBytes();
+		send(sendMsg, sendMsg.length);
 	}
 	
 	/**
@@ -197,6 +243,16 @@ public class FloorSubsystem extends Thread
 			floors.get(currentFloorNum - 1).setLampWhenElevatorLeaves(elevatorCarNum);
 		}
 			
+	}
+	
+	public static void main (String [] argsd)
+	{
+		int numOfloors = 5;
+		int numOfElevators = 1;
+		String schedulerIp = "1.1.1.1"; //NEED TO Change
+		
+		FloorSubsystem floorSubsystem = new FloorSubsystem (schedulerIp, "InputInstructions.txt", numOfloors, numOfElevators);
+		floorSubsystem.startFloor();
 	}
 	
 	

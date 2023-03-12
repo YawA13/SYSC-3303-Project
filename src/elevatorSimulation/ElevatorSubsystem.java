@@ -54,7 +54,7 @@ public class ElevatorSubsystem extends Thread
 		this.elevator = new Elevator(floors, this);
 		this.carNumber = carNumber;
 		try {
-	         sendReceiveSocket = new DatagramSocket(RECEIVE_PORT);
+	         sendReceiveSocket = new DatagramSocket(RECEIVE_PORT+carNumber);
 	      } catch (SocketException se) { 
 	         se.printStackTrace();
 	         System.exit(1);
@@ -141,11 +141,18 @@ public class ElevatorSubsystem extends Thread
 	private void send(byte [] request, int requestLength)
 	{
 		 try {
-	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(schedulerIp), SENDER_PORT);
-	      } catch (UnknownHostException e) {
+	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(schedulerIp), SENDER_PORT+carNumber);
+		 } catch (UnknownHostException e) {
 	         e.printStackTrace();
 	         System.exit(1);
 	      }
+		 
+	      try {
+		         sendReceiveSocket.send(sendPacket);
+		      } catch (IOException e) {
+		         e.printStackTrace();
+		         System.exit(1);
+		      }
 	}
 	
 	private void receive()

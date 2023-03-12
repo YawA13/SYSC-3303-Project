@@ -62,11 +62,11 @@ public class Floor
 	{
 		if (isElevatorStopping)
 		{
-			System.out.println("Stop at Floor");
+			//System.out.println("Stop at Floor");
 			floorLamps [getLampLocation(currentDirection)] = ButtonStatus.Off;
 		}
 		directionLamps.get(carNumber)[getLampLocation(currentDirection)] = currentDirection;
-		System.out.println("Reach Floor : "+getStatus());
+		//System.out.println("Reach Floor : "+getStatus());
 	}
 	
 	
@@ -76,7 +76,7 @@ public class Floor
 		{
 			directionLamps.get(carNumber)[i] = ButtonStatus.Off;
 		}
-		System.out.println("Elevator Leaves :"+getStatus());
+		//System.out.println("Elevator Leaves :"+getStatus());
 	}
 	
 	private int getLampLocation (ButtonStatus status)

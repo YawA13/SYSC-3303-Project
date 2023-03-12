@@ -1,7 +1,11 @@
 package elevatorSimulation;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetAddress;
+import java.net.SocketException;
+import java.net.UnknownHostException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -50,9 +54,14 @@ public class Scheduler extends Thread
     * Port that data will be sent to
     */
    private static final int SENDER_PORT_ELEVATOR = 30;
-   private static final int SENDER_PORT_FLOOR = 40;
-   private static final int RECEIVE_PORT_FLOOR = 33;
    private static final int RECEIVE_PORT_ELEVATOR = 23;
+   
+   private static final int SENDER_PORT_FLOOR1 = 40;
+   private static final int RECEIVE_PORT_FLOOR1 = 33;
+   
+   private static final int SENDER_PORT_FLOOR2 = 50;
+   private static final int RECEIVE_PORT_FLOOR2 = 43;
+   
    private Thread [] schedulerToClient;
 	
 	/**
@@ -77,6 +86,16 @@ public class Scheduler extends Thread
 			schedulerToClient[i] = new SchedulerElevatorHost(elevatorIp, this, SENDER_PORT_ELEVATOR+i, RECEIVE_PORT_ELEVATOR+i);
 			schedulerToClient[i].start();
 		}
+		
+		Thread schedulerFloorHost = new SchedulerFloorHost(floorIp, this, SENDER_PORT_FLOOR1, RECEIVE_PORT_FLOOR1);
+		schedulerFloorHost.start();
+		
+		try {
+			 sendReceiveSocket = new DatagramSocket(RECEIVE_PORT_FLOOR2);  
+	      } catch (SocketException se) {
+	         se.printStackTrace();
+	         System.exit(1);
+	      } 
 	}
 	
 	
@@ -85,6 +104,21 @@ public class Scheduler extends Thread
 		return RECEIVE_PORT_ELEVATOR;
 	}
 	
+	private void sendToFloor(byte [] request, int requestLength)
+	{
+		 try {
+	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(floorIp), SENDER_PORT_FLOOR2);
+	      } catch (UnknownHostException e) {
+	         e.printStackTrace();
+	         System.exit(1);
+	      }
+	      try {
+		         sendReceiveSocket.send(sendPacket);
+		      } catch (IOException e) {
+		         e.printStackTrace();
+		         System.exit(1);
+		      }
+	}
 	
 	/**
 	 * Scheduler thread that does nothing in this iteration
@@ -236,7 +270,20 @@ public class Scheduler extends Thread
 			
 		}
 		
-		floorSubsystem.elevatorReachFloor(elevatorCarNum, elevatorLocation, directionFloor, stopElevator);
+		
+		
+		byte[] byteArray0 = {0};
+		String byte0 = new String(byteArray0);
+		
+		String sendMsg =  Integer.toString(elevatorCarNum)+byte0
+				+ Integer.toString(elevatorLocation)+byte0
+				+ directionFloor.toString()+byte0
+				+ Boolean.toString(stopElevator)+byte0;
+		byte [] sendRequest = sendMsg.getBytes();
+
+
+		sendToFloor(sendRequest, sendRequest.length);
+		//floorSubsystem.elevatorReachFloor(elevatorCarNum, elevatorLocation, directionFloor, stopElevator);
 		
 		((SchedulerElevatorHost) schedulerToClient[hostIndex]).checkElevatorLocation(stop, increment, decrement);
 		

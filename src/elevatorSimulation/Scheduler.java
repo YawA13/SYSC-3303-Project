@@ -56,11 +56,11 @@ public class Scheduler extends Thread
    private static final int SENDER_PORT_ELEVATOR = 30;
    private static final int RECEIVE_PORT_ELEVATOR = 23;
    
-   private static final int SENDER_PORT_FLOOR1 = 40;
-   private static final int RECEIVE_PORT_FLOOR1 = 33;
+   private static final int SENDER_PORT_FLOOR1 = 50;
+   private static final int RECEIVE_PORT_FLOOR1 = 43;
    
-   private static final int SENDER_PORT_FLOOR2 = 50;
-   private static final int RECEIVE_PORT_FLOOR2 = 43;
+   private static final int SENDER_PORT = 40;
+   private static final int RECEIVE_PORT = 33;
    
    private Thread [] schedulerToClient;
 	
@@ -91,7 +91,7 @@ public class Scheduler extends Thread
 		schedulerFloorHost.start();
 		
 		try {
-			 sendReceiveSocket = new DatagramSocket(RECEIVE_PORT_FLOOR2);  
+			 sendReceiveSocket = new DatagramSocket(RECEIVE_PORT);  
 	      } catch (SocketException se) {
 	         se.printStackTrace();
 	         System.exit(1);
@@ -107,7 +107,7 @@ public class Scheduler extends Thread
 	private void sendToFloor(byte [] request, int requestLength)
 	{
 		 try {
-	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(floorIp), SENDER_PORT_FLOOR2);
+	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(floorIp), SENDER_PORT);
 	      } catch (UnknownHostException e) {
 	         e.printStackTrace();
 	         System.exit(1);

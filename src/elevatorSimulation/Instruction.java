@@ -20,6 +20,7 @@ public class Instruction {
 	private int carButton; //Elevator number
 	private ButtonStatus buttonStatus; //Direction elevator will go
 	private long timeAfterInital;
+	private String inputData;
 	
 	/**
 	 * Initialize Instruction object by passing in time, floor, elevator number,
@@ -58,6 +59,7 @@ public class Instruction {
 	 */
 	public Instruction (String inputData)
 	{
+		this.inputData = inputData;
 		String [] split = inputData.split("\\t"); //Split text based on TAB delimiter into array
 		
 		//Set time as first object in array
@@ -133,5 +135,10 @@ public class Instruction {
 	public long getTimeAfterInital()
 	{
 		return timeAfterInital;
+	}
+	
+	public String getInputData()
+	{
+		return inputData;
 	}
 }

@@ -1,5 +1,7 @@
 package elevatorSimulation;
 
+import java.net.DatagramPacket;
+import java.net.DatagramSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -31,15 +33,35 @@ public class Scheduler extends Thread
 	//private List <Instruction> activeInstructions;
 	private SchedulerStates state;
 	
-	private FloorSubsystem floorSubsystem;
+	private String floorIp;
+	private String elevatorIp;
 	private Map<Integer, ArrayList<Instruction>> allActiveInstructions;
-	
+	/**
+	 * packets to receive and send data
+	 */
+   private DatagramPacket sendPacket, receivePacket;
+   
+   /**
+    * sockets to send and receive data
+    */
+   private DatagramSocket sendReceiveSocket;
+   
+   /**
+    * Port that data will be sent to
+    */
+   private static final int SENDER_PORT_ELEVATOR = 30;
+   private static final int SENDER_PORT_FLOOR = 40;
+   private static final int RECEIVE_PORT_FLOOR = 33;
+   private static final int RECEIVE_PORT_ELEVATOR = 23;
+   private Thread [] schedulerToClient;
 	
 	/**
 	 * Initialize scheduler object
 	 */
-	public Scheduler(int numOfElevators)
+	public Scheduler(String floorIp, String elevatorIp, int numOfElevators)
 	{
+		this.floorIp = floorIp;
+		this.elevatorIp = elevatorIp;
 		allActiveInstructions = new HashMap<>();
 		for (int i = 0; i < numOfElevators; i++)
 		{
@@ -49,18 +71,25 @@ public class Scheduler extends Thread
 		pendingInstructions = new ArrayList<Instruction>(); 
 		state = SchedulerStates.Waiting;
 	
+		schedulerToClient =  new Thread [numOfElevators];
+		for(int i = 0; i < schedulerToClient.length; i++)
+		{
+			schedulerToClient[i] = new SchedulerElevatorHost(elevatorIp, this, SENDER_PORT_ELEVATOR+i, RECEIVE_PORT_ELEVATOR+i);
+			schedulerToClient[i].start();
+		}
 	}
 	
 	
-	public void setFloorSubsystem(FloorSubsystem floorSubsystem)
+	public int getRECEIVE_PORT_ELEVATOR()
 	{
-		this.floorSubsystem = floorSubsystem;
+		return RECEIVE_PORT_ELEVATOR;
 	}
+	
 	
 	/**
 	 * Scheduler thread that does nothing in this iteration
 	 */
-	public void run()
+	public void startScheduler()
 	{
 		while(true)
 		{
@@ -150,7 +179,7 @@ public class Scheduler extends Thread
 		System.out.println("Scheduler has been notified that finished elevator has finished its instructions");
 	}
 	
-	public synchronized int [] checkElevatorLocation(int elevatorCarNum, int elevatorLocation, ButtonStatus elevatorDirection) 
+	public synchronized void checkElevatorLocation(int elevatorCarNum, int elevatorLocation, ButtonStatus elevatorDirection, int hostIndex) 
 	{
 
 		List<Instruction> activeInstructions = allActiveInstructions.get(elevatorCarNum);
@@ -167,7 +196,7 @@ public class Scheduler extends Thread
 		}
 		
 		
-		int stop = 0;
+		boolean stop = false;
 		int increment = 0;
 		int decrement = 0;
 		//list of floor lamps false
@@ -181,7 +210,7 @@ public class Scheduler extends Thread
 				//add to floor lamps for true
 				activeInstructions.add((pendingInstructions.get(i)));
 				pendingInstructions.remove(pendingInstructions.get(i));
-				stop = 1;	
+				stop = true;	
 			}
 		}
 		
@@ -193,7 +222,7 @@ public class Scheduler extends Thread
 				//floorLastArrived = elevatorLocation;
 				increment++;
 				directionFloor = activeInstructions.get(i).getButtonStatus();
-				stop = 1;
+				stop = true;
 			}
 			
 			else if (activeInstructions.get(i).getCarButton() == elevatorLocation &&
@@ -202,20 +231,27 @@ public class Scheduler extends Thread
 				//add to floor lamps false
 				activeInstructions.remove(activeInstructions.get(i));
 				decrement++;
-				stop =  1;
+				stop =  true;
 			}
 			
 		}
 		
 		floorSubsystem.elevatorReachFloor(elevatorCarNum, elevatorLocation, directionFloor, stopElevator);
 		
-
-		int [] returnInt = {stop, increment, decrement}; //stop ( ==1), increment, decrement;  
+		((SchedulerElevatorHost) schedulerToClient[hostIndex]).checkElevatorLocation(stop, increment, decrement);
 		
 		notifyAll(); //Notify synchronized methods
-		return returnInt;
 			
 	}
 	
+	public static void main (String [] argsd)
+	{
+		int numOfElevators = 1;
+		String floorIp = "1.1.1.1"; //NEED TO Change
+		String elevatorIp = "1.1.1.1"; //NEED TO Change
+		
+		Scheduler scheduler = new Scheduler (floorIp, elevatorIp, numOfElevators);
+		scheduler.startScheduler();
+	}
 	
 }

@@ -272,7 +272,7 @@ public class ElevatorSubsystem extends Thread
 			{	
 
 				textLength = i - textIndex;
-				String possibleWord = new String(request, textIndex, textLength);
+				String possibleWord = new String(receivePacket.getData(), textIndex, textLength);
 				receiveMessages [receiveMessagesIndex] = possibleWord;
 				textIndex = i + 1;
 				receiveMessagesIndex++;

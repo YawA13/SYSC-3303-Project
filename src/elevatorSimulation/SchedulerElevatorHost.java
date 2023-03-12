@@ -175,7 +175,7 @@ public class SchedulerElevatorHost extends Thread
 		byte[] byteArray0 = {0};
 		String byte0 = new String(byteArray0);
 		
-		String sendMsg = Boolean.toString(stop)
+		String sendMsg = Boolean.toString(stop)+byte0
 				+ Integer.toString(increment)+byte0
 				+ Integer.toString(decrement)+byte0;
 		byte [] sendRequest = sendMsg.getBytes();

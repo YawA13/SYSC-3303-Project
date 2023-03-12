@@ -13,6 +13,7 @@ public class ElevatorSimulation {
 	
 	public static void main (String [] args)
 	{
+		/**
 		int numOfloors = 5;
 		int numOfElevators = 2;
 		
@@ -34,7 +35,7 @@ public class ElevatorSimulation {
 		{
 			elevatorSubsystems.get(i).start();
 		}
-		
+		**/
 	}
 
 }

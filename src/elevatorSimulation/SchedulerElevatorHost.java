@@ -71,15 +71,15 @@ public class SchedulerElevatorHost extends Thread
 		{
 			byte data[] = new byte[100];
 			receivePacket = new DatagramPacket(data, data.length);
-			System.out.println("Server: Waiting for Packet.\n");
+			System.out.println("SEH Server: Waiting for Packet.\n");
 
 			// Block until a datagram packet is received from receiveSocket.
 			try {        
-				System.out.println("Waiting..."); // so we know we're waiting
+				System.out.println("SEH Waiting..."); // so we know we're waiting
 				sendReceiveSocket.receive(receivePacket);
 			} catch (IOException e) {
-				System.out.print("IO Exception: likely:");
-				System.out.println("Receive Socket Timed Out.\n" + e);
+				System.out.print("SEH IO Exception: likely:");
+				System.out.println("SEH Receive Socket Timed Out.\n" + e);
 				e.printStackTrace();
 				System.exit(1);
 			}
@@ -113,7 +113,7 @@ public class SchedulerElevatorHost extends Thread
 					direction = ButtonStatus.Down; //Set to enum down
 				}
 				
-				int posOfHost = scheduler.getRECEIVE_PORT_ELEVATOR();
+				int posOfHost = receivePort - scheduler.getRECEIVE_PORT_ELEVATOR();
 				scheduler.checkElevatorLocation(carNum, elevatorLocation, direction, posOfHost);
 				
 			}
@@ -175,7 +175,7 @@ public class SchedulerElevatorHost extends Thread
 		byte[] byteArray0 = {0};
 		String byte0 = new String(byteArray0);
 		
-		String sendMsg = Boolean.toString(stop)
+		String sendMsg = Boolean.toString(stop)+byte0
 				+ Integer.toString(increment)+byte0
 				+ Integer.toString(decrement)+byte0;
 		byte [] sendRequest = sendMsg.getBytes();

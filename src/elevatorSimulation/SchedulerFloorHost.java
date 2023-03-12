@@ -71,15 +71,15 @@ public class SchedulerFloorHost extends Thread
 		{
 			byte data[] = new byte[100];
 			receivePacket = new DatagramPacket(data, data.length);
-			System.out.println("Server: Waiting for Packet.\n");
+			System.out.println("SFH Server: Waiting for Packet.\n");
 
 			// Block until a datagram packet is received from receiveSocket.
 			try {        
-				System.out.println("Waiting..."); // so we know we're waiting
+				System.out.println("SFH Waiting..."); // so we know we're waiting
 				sendReceiveSocket.receive(receivePacket);
 			} catch (IOException e) {
-				System.out.print("IO Exception: likely:");
-				System.out.println("Receive Socket Timed Out.\n" + e);
+				System.out.print("SFH IO Exception: likely:");
+				System.out.println("SFH Receive Socket Timed Out.\n" + e);
 				e.printStackTrace();
 				System.exit(1);
 			}

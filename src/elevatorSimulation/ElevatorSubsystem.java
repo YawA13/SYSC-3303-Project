@@ -272,7 +272,7 @@ public class ElevatorSubsystem extends Thread
 			{	
 
 				textLength = i - textIndex;
-				String possibleWord = new String(request, textIndex, textLength);
+				String possibleWord = new String(receivePacket.getData(), textIndex, textLength);
 				receiveMessages [receiveMessagesIndex] = possibleWord;
 				textIndex = i + 1;
 				receiveMessagesIndex++;
@@ -353,7 +353,7 @@ public class ElevatorSubsystem extends Thread
 	{
 		int numOfloors = 5;
 		int numOfElevators = 1;
-		String schedulerIp = "1.1.1.1"; //NEED TO Change
+		String schedulerIp = "192.168.0.104"; //NEED TO Change
 		
 		ArrayList<ElevatorSubsystem> elevatorSubsystems = new ArrayList<>();
 		

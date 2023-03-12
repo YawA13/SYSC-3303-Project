@@ -56,11 +56,11 @@ public class Scheduler extends Thread
    private static final int SENDER_PORT_ELEVATOR = 30;
    private static final int RECEIVE_PORT_ELEVATOR = 23;
    
-   private static final int SENDER_PORT_FLOOR1 = 40;
-   private static final int RECEIVE_PORT_FLOOR1 = 33;
-   
-   private static final int SENDER_PORT_FLOOR2 = 50;
-   private static final int RECEIVE_PORT_FLOOR2 = 43;
+   private static final int SENDER_PORT_FLOOR_SUBSYSTEM = 50;
+   private static final int RECEIVE_PORT_FLOOR_SUBSYSTEM = 43;
+
+   private static final int SENDER_PORT_FlOOR_SUBSYSTEM_HOST = 40;
+   private static final int RECEIVE_PORT_FlOOR_SUBSYSTEM_HOST = 33;
    
    private Thread [] schedulerToClient;
 	
@@ -87,11 +87,11 @@ public class Scheduler extends Thread
 			schedulerToClient[i].start();
 		}
 		
-		Thread schedulerFloorHost = new SchedulerFloorHost(floorIp, this, SENDER_PORT_FLOOR1, RECEIVE_PORT_FLOOR1);
+		Thread schedulerFloorHost = new SchedulerFloorHost(floorIp, this, SENDER_PORT_FLOOR_SUBSYSTEM, RECEIVE_PORT_FLOOR_SUBSYSTEM);
 		schedulerFloorHost.start();
 		
 		try {
-			 sendReceiveSocket = new DatagramSocket(RECEIVE_PORT_FLOOR2);  
+			sendReceiveSocket = new DatagramSocket(RECEIVE_PORT_FlOOR_SUBSYSTEM_HOST);
 	      } catch (SocketException se) {
 	         se.printStackTrace();
 	         System.exit(1);
@@ -107,7 +107,7 @@ public class Scheduler extends Thread
 	private void sendToFloor(byte [] request, int requestLength)
 	{
 		 try {
-	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(floorIp), SENDER_PORT_FLOOR2);
+	         sendPacket = new DatagramPacket(request, requestLength, InetAddress.getByName(floorIp), SENDER_PORT_FlOOR_SUBSYSTEM_HOST);
 	      } catch (UnknownHostException e) {
 	         e.printStackTrace();
 	         System.exit(1);
@@ -294,8 +294,8 @@ public class Scheduler extends Thread
 	public static void main (String [] argsd)
 	{
 		int numOfElevators = 1;
-		String floorIp = "1.1.1.1"; //NEED TO Change
-		String elevatorIp = "1.1.1.1"; //NEED TO Change
+		String floorIp = "192.168.0.104"; //NEED TO Change
+		String elevatorIp = "192.168.0.104"; //NEED TO Change
 		
 		Scheduler scheduler = new Scheduler (floorIp, elevatorIp, numOfElevators);
 		scheduler.startScheduler();

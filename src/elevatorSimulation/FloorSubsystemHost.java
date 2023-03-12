@@ -73,6 +73,7 @@ public class FloorSubsystemHost extends Thread
 			try {        
 				System.out.println("Waiting..."); // so we know we're waiting
 				sendReceiveSocket.receive(receivePacket);
+				System.out.println("Received packet");
 			} catch (IOException e) {
 				System.out.print("IO Exception: likely:");
 				System.out.println("Receive Socket Timed Out.\n" + e);

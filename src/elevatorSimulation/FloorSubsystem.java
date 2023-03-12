@@ -249,7 +249,7 @@ public class FloorSubsystem extends Thread
 	{
 		int numOfloors = 5;
 		int numOfElevators = 1;
-		String schedulerIp = "1.1.1.1"; //NEED TO Change
+		String schedulerIp = "192.168.0.104"; //NEED TO Change
 		
 		FloorSubsystem floorSubsystem = new FloorSubsystem (schedulerIp, "InputInstructions.txt", numOfloors, numOfElevators);
 		floorSubsystem.startFloor();

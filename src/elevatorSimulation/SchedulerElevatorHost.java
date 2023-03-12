@@ -113,7 +113,7 @@ public class SchedulerElevatorHost extends Thread
 					direction = ButtonStatus.Down; //Set to enum down
 				}
 				
-				int posOfHost = scheduler.getRECEIVE_PORT_ELEVATOR();
+				int posOfHost = receivePort - scheduler.getRECEIVE_PORT_ELEVATOR();
 				scheduler.checkElevatorLocation(carNum, elevatorLocation, direction, posOfHost);
 				
 			}

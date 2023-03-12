@@ -25,6 +25,7 @@ import java.util.Set;
 public class Scheduler extends Thread
 {
 	
+	
 	/**
 	list for instructions from ppl outside the elevator, 
 	will be checked when elevator reaches a floor if going same direction **/
